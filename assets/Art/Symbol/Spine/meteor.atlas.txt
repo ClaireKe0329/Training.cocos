@@ -1,0 +1,866 @@
+
+meteor.png
+size: 1984,2024
+format: RGBA4444
+filter: Nearest,Nearest
+repeat: none
+images/A01
+  rotate: false
+  xy: 753, 905
+  size: 32, 128
+  orig: 32, 128
+  offset: 0, 0
+  index: -1
+images/Volcano_Base_WILD1_00001
+  rotate: false
+  xy: 456, 1
+  size: 115, 115
+  orig: 276, 276
+  offset: 93, 121
+  index: -1
+images/Volcano_Base_WILD1_00003
+  rotate: false
+  xy: 478, 341
+  size: 133, 179
+  orig: 276, 276
+  offset: 88, 75
+  index: -1
+images/Volcano_Base_WILD1_00004
+  rotate: false
+  xy: 612, 392
+  size: 137, 128
+  orig: 276, 276
+  offset: 90, 83
+  index: -1
+images/Volcano_Base_WILD1_00010
+  rotate: false
+  xy: 1, 1753
+  size: 276, 269
+  orig: 276, 276
+  offset: 0, 7
+  index: -1
+images/Volcano_Base_WILD1_00011
+  rotate: false
+  xy: 1, 1485
+  size: 276, 267
+  orig: 276, 276
+  offset: 0, 9
+  index: -1
+images/Volcano_Base_WILD1_00012
+  rotate: false
+  xy: 1, 1218
+  size: 275, 266
+  orig: 276, 276
+  offset: 1, 10
+  index: -1
+images/Volcano_Base_WILD1_00013
+  rotate: false
+  xy: 277, 1222
+  size: 271, 262
+  orig: 276, 276
+  offset: 3, 14
+  index: -1
+images/Volcano_Base_WILD1_00014
+  rotate: false
+  xy: 278, 1766
+  size: 262, 256
+  orig: 276, 276
+  offset: 9, 20
+  index: -1
+images/Volcano_Base_WILD1_00015
+  rotate: false
+  xy: 786, 1775
+  size: 241, 247
+  orig: 276, 276
+  offset: 30, 29
+  index: -1
+images/Volcano_Base_WILD1_00016
+  rotate: false
+  xy: 541, 1771
+  size: 244, 251
+  orig: 276, 276
+  offset: 24, 25
+  index: -1
+images/Volcano_Base_WILD1_00017
+  rotate: false
+  xy: 541, 1520
+  size: 257, 250
+  orig: 276, 276
+  offset: 18, 26
+  index: -1
+images/Volcano_Base_WILD1_00018
+  rotate: false
+  xy: 278, 1518
+  size: 262, 247
+  orig: 276, 276
+  offset: 14, 29
+  index: -1
+images/Volcano_Base_WILD1_00019
+  rotate: false
+  xy: 1028, 1778
+  size: 267, 244
+  orig: 276, 276
+  offset: 9, 32
+  index: -1
+images/Volcano_Base_WILD1_00020
+  rotate: false
+  xy: 799, 1530
+  size: 274, 244
+  orig: 276, 276
+  offset: 0, 32
+  index: -1
+images/Volcano_Base_WILD1_00021
+  rotate: false
+  xy: 549, 1277
+  size: 275, 242
+  orig: 276, 276
+  offset: 0, 34
+  index: -1
+images/Volcano_Base_WILD1_00022
+  rotate: false
+  xy: 268, 976
+  size: 265, 241
+  orig: 276, 276
+  offset: 9, 35
+  index: -1
+images/Volcano_Base_WILD1_00023
+  rotate: false
+  xy: 1, 977
+  size: 266, 240
+  orig: 276, 276
+  offset: 10, 36
+  index: -1
+images/Volcano_Base_WILD1_00024
+  rotate: false
+  xy: 1073, 1060
+  size: 235, 236
+  orig: 276, 276
+  offset: 37, 40
+  index: -1
+images/Volcano_Base_WILD1_00025
+  rotate: false
+  xy: 514, 747
+  size: 238, 228
+  orig: 276, 276
+  offset: 38, 48
+  index: -1
+images/Volcano_Base_WILD1_00026
+  rotate: false
+  xy: 1, 742
+  size: 258, 234
+  orig: 276, 276
+  offset: 16, 42
+  index: -1
+images/Volcano_Base_WILD1_00027
+  rotate: false
+  xy: 800, 1038
+  size: 257, 238
+  orig: 276, 276
+  offset: 19, 38
+  index: -1
+images/Volcano_Base_WILD1_00028
+  rotate: false
+  xy: 260, 734
+  size: 253, 241
+  orig: 276, 276
+  offset: 22, 35
+  index: -1
+images/Volcano_Base_WILD1_00029
+  rotate: false
+  xy: 549, 1034
+  size: 250, 242
+  orig: 276, 276
+  offset: 25, 34
+  index: -1
+images/Volcano_Base_WILD1_00030
+  rotate: false
+  xy: 825, 1287
+  size: 247, 242
+  orig: 276, 276
+  offset: 28, 34
+  index: -1
+images/Volcano_Base_WILD1_00031
+  rotate: false
+  xy: 1, 502
+  size: 241, 239
+  orig: 276, 276
+  offset: 32, 37
+  index: -1
+images/Volcano_Base_WILD1_00032
+  rotate: false
+  xy: 800, 795
+  size: 240, 242
+  orig: 276, 276
+  offset: 35, 34
+  index: -1
+images/Volcano_Base_WILD1_00033
+  rotate: false
+  xy: 1074, 1535
+  size: 236, 242
+  orig: 276, 276
+  offset: 38, 34
+  index: -1
+images/Volcano_Base_WILD1_00034
+  rotate: false
+  xy: 1296, 1780
+  size: 234, 242
+  orig: 276, 276
+  offset: 41, 34
+  index: -1
+images/Volcano_Base_WILD1_00035
+  rotate: false
+  xy: 1297, 1298
+  size: 231, 236
+  orig: 276, 276
+  offset: 44, 40
+  index: -1
+images/Volcano_Base_WILD1_00036
+  rotate: false
+  xy: 688, 69
+  size: 229, 228
+  orig: 276, 276
+  offset: 47, 48
+  index: -1
+images/Volcano_Base_WILD1_00037
+  rotate: false
+  xy: 1214, 130
+  size: 228, 225
+  orig: 276, 276
+  offset: 48, 51
+  index: -1
+images/Volcano_Base_WILD1_00038
+  rotate: false
+  xy: 1074, 1297
+  size: 222, 237
+  orig: 276, 276
+  offset: 51, 39
+  index: -1
+images/Volcano_Base_WILD1_00039
+  rotate: false
+  xy: 1309, 1066
+  size: 224, 231
+  orig: 276, 276
+  offset: 52, 45
+  index: -1
+images/Volcano_Base_WILD1_00045
+  rotate: false
+  xy: 1754, 1328
+  size: 228, 230
+  orig: 276, 276
+  offset: 48, 46
+  index: -1
+images/Volcano_Base_WILD1_00046
+  rotate: false
+  xy: 1721, 371
+  size: 223, 230
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD1_00048
+  rotate: false
+  xy: 1756, 865
+  size: 222, 230
+  orig: 276, 276
+  offset: 51, 46
+  index: -1
+images/Volcano_Base_WILD1_00049
+  rotate: false
+  xy: 1723, 603
+  size: 223, 230
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD1_00050
+  rotate: false
+  xy: 233, 270
+  size: 222, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00051
+  rotate: false
+  xy: 1762, 1559
+  size: 221, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00052
+  rotate: false
+  xy: 1531, 1791
+  size: 225, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00053
+  rotate: false
+  xy: 1538, 1559
+  size: 223, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00054
+  rotate: false
+  xy: 1757, 1791
+  size: 223, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00055
+  rotate: false
+  xy: 1754, 1096
+  size: 221, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00056
+  rotate: false
+  xy: 233, 38
+  size: 222, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00057
+  rotate: false
+  xy: 1311, 1548
+  size: 226, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00058
+  rotate: false
+  xy: 1529, 1316
+  size: 224, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00059
+  rotate: false
+  xy: 1041, 580
+  size: 225, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00060
+  rotate: false
+  xy: 1309, 834
+  size: 223, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00061
+  rotate: false
+  xy: 1267, 356
+  size: 223, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00062
+  rotate: false
+  xy: 1533, 834
+  size: 222, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00063
+  rotate: false
+  xy: 1501, 602
+  size: 221, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00064
+  rotate: false
+  xy: 1491, 132
+  size: 210, 231
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_32
+  rotate: false
+  xy: 1, 277
+  size: 231, 224
+  orig: 276, 276
+  offset: 39, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_34
+  rotate: false
+  xy: 1, 52
+  size: 231, 224
+  orig: 276, 276
+  offset: 37, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_36
+  rotate: false
+  xy: 918, 71
+  size: 228, 224
+  orig: 276, 276
+  offset: 42, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_38
+  rotate: false
+  xy: 750, 522
+  size: 233, 224
+  orig: 276, 276
+  offset: 37, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_40
+  rotate: false
+  xy: 1267, 588
+  size: 233, 223
+  orig: 276, 276
+  offset: 36, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_44
+  rotate: false
+  xy: 1702, 140
+  size: 228, 223
+  orig: 276, 276
+  offset: 41, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_46
+  rotate: false
+  xy: 243, 505
+  size: 234, 228
+  orig: 276, 276
+  offset: 36, 42
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_48
+  rotate: false
+  xy: 1041, 812
+  size: 237, 225
+  orig: 276, 276
+  offset: 33, 45
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_50
+  rotate: false
+  xy: 514, 521
+  size: 235, 225
+  orig: 276, 276
+  offset: 35, 44
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_52
+  rotate: false
+  xy: 456, 117
+  size: 231, 223
+  orig: 276, 276
+  offset: 38, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_56
+  rotate: false
+  xy: 983, 296
+  size: 230, 225
+  orig: 276, 276
+  offset: 40, 44
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_60
+  rotate: false
+  xy: 1491, 364
+  size: 229, 223
+  orig: 276, 276
+  offset: 40, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_62
+  rotate: false
+  xy: 750, 298
+  size: 232, 223
+  orig: 276, 276
+  offset: 37, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_68
+  rotate: false
+  xy: 1534, 1092
+  size: 219, 223
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+
+meteor2.png
+size: 1752,1348
+format: RGBA4444
+filter: Nearest,Nearest
+repeat: none
+images/Volcano_Base_WILD1_00002
+  rotate: false
+  xy: 1336, 564
+  size: 133, 177
+  orig: 276, 276
+  offset: 81, 69
+  index: -1
+images/Volcano_Base_WILD1_00005
+  rotate: false
+  xy: 1469, 4
+  size: 186, 186
+  orig: 276, 276
+  offset: 90, 90
+  index: -1
+images/Volcano_Base_WILD1_00006
+  rotate: false
+  xy: 1552, 191
+  size: 187, 193
+  orig: 276, 276
+  offset: 89, 83
+  index: -1
+images/Volcano_Base_WILD1_00007
+  rotate: false
+  xy: 1552, 385
+  size: 188, 188
+  orig: 276, 276
+  offset: 88, 88
+  index: -1
+images/Volcano_Base_WILD1_00008
+  rotate: false
+  xy: 1552, 574
+  size: 189, 183
+  orig: 276, 276
+  offset: 87, 93
+  index: -1
+images/Volcano_Base_WILD1_00009
+  rotate: false
+  xy: 1552, 758
+  size: 190, 177
+  orig: 276, 276
+  offset: 86, 99
+  index: -1
+images/Volcano_Base_WILD1_00040
+  rotate: false
+  xy: 1, 661
+  size: 222, 225
+  orig: 276, 276
+  offset: 53, 51
+  index: -1
+images/Volcano_Base_WILD1_00041
+  rotate: false
+  xy: 1, 435
+  size: 222, 225
+  orig: 276, 276
+  offset: 53, 51
+  index: -1
+images/Volcano_Base_WILD1_00042
+  rotate: false
+  xy: 225, 893
+  size: 220, 225
+  orig: 276, 276
+  offset: 53, 51
+  index: -1
+images/Volcano_Base_WILD1_00043
+  rotate: false
+  xy: 223, 1119
+  size: 220, 228
+  orig: 276, 276
+  offset: 52, 48
+  index: -1
+images/Volcano_Base_WILD1_00044
+  rotate: false
+  xy: 1, 887
+  size: 223, 229
+  orig: 276, 276
+  offset: 52, 47
+  index: -1
+images/Volcano_Base_WILD1_00047
+  rotate: false
+  xy: 1, 1117
+  size: 221, 230
+  orig: 276, 276
+  offset: 51, 46
+  index: -1
+images/Volcano_Base_WILD1_00065
+  rotate: false
+  xy: 1266, 12
+  size: 202, 220
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00066
+  rotate: false
+  xy: 1, 2
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00067
+  rotate: false
+  xy: 202, 2
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00068
+  rotate: false
+  xy: 403, 4
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00069
+  rotate: false
+  xy: 1336, 922
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00070
+  rotate: false
+  xy: 1336, 922
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00071
+  rotate: false
+  xy: 1336, 922
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00072
+  rotate: false
+  xy: 1336, 922
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00073
+  rotate: false
+  xy: 1336, 922
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00074
+  rotate: false
+  xy: 1336, 922
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD1_00075
+  rotate: false
+  xy: 1336, 922
+  size: 200, 206
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+images/Volcano_Base_WILD_01
+  rotate: false
+  xy: 1336, 742
+  size: 187, 179
+  orig: 276, 276
+  offset: 65, 76
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_00
+  rotate: false
+  xy: 1552, 936
+  size: 199, 205
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_02
+  rotate: false
+  xy: 1335, 235
+  size: 216, 218
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_04
+  rotate: false
+  xy: 901, 229
+  size: 217, 221
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_06
+  rotate: false
+  xy: 1112, 676
+  size: 219, 222
+  orig: 276, 276
+  offset: 49, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_08
+  rotate: false
+  xy: 679, 225
+  size: 221, 223
+  orig: 276, 276
+  offset: 49, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_10
+  rotate: false
+  xy: 827, 1
+  size: 220, 223
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_12
+  rotate: false
+  xy: 451, 448
+  size: 221, 224
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_14
+  rotate: false
+  xy: 671, 673
+  size: 221, 224
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_16
+  rotate: false
+  xy: 224, 661
+  size: 221, 225
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_18
+  rotate: false
+  xy: 1, 209
+  size: 222, 225
+  orig: 276, 276
+  offset: 48, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_20
+  rotate: false
+  xy: 672, 898
+  size: 220, 224
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_22
+  rotate: false
+  xy: 444, 1123
+  size: 226, 224
+  orig: 276, 276
+  offset: 45, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_24
+  rotate: false
+  xy: 671, 1123
+  size: 224, 224
+  orig: 276, 276
+  offset: 47, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_26
+  rotate: false
+  xy: 446, 898
+  size: 225, 224
+  orig: 276, 276
+  offset: 46, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_28
+  rotate: false
+  xy: 446, 673
+  size: 224, 224
+  orig: 276, 276
+  offset: 46, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_30
+  rotate: false
+  xy: 224, 436
+  size: 226, 224
+  orig: 276, 276
+  offset: 45, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_42
+  rotate: false
+  xy: 604, 1
+  size: 222, 222
+  orig: 276, 276
+  offset: 46, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_54
+  rotate: false
+  xy: 451, 224
+  size: 227, 223
+  orig: 276, 276
+  offset: 42, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_58
+  rotate: false
+  xy: 224, 211
+  size: 226, 224
+  orig: 276, 276
+  offset: 41, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_64
+  rotate: false
+  xy: 673, 449
+  size: 225, 223
+  orig: 276, 276
+  offset: 45, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_66
+  rotate: false
+  xy: 893, 675
+  size: 218, 223
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_70
+  rotate: false
+  xy: 899, 451
+  size: 218, 223
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_72
+  rotate: false
+  xy: 893, 899
+  size: 219, 223
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_74
+  rotate: false
+  xy: 896, 1124
+  size: 219, 223
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_76
+  rotate: false
+  xy: 1113, 901
+  size: 218, 222
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_78
+  rotate: false
+  xy: 1118, 454
+  size: 217, 221
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_80
+  rotate: false
+  xy: 1116, 1125
+  size: 218, 222
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_82
+  rotate: false
+  xy: 1048, 7
+  size: 217, 221
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_84
+  rotate: false
+  xy: 1119, 233
+  size: 215, 220
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_86
+  rotate: false
+  xy: 1336, 1129
+  size: 213, 218
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_88
+  rotate: false
+  xy: 1552, 1142
+  size: 199, 205
+  orig: 276, 276
+  offset: 50, 46
+  index: -1

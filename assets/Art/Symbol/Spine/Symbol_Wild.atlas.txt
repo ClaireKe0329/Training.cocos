@@ -1,0 +1,482 @@
+
+Symbol_Combin03.webp
+size: 1988,1988
+format: RGBA4444
+filter: Linear,Linear
+repeat: none
+Meteor/A01
+  rotate: false
+  xy: 973, 797
+  size: 32, 128
+  orig: 32, 128
+  offset: 0, 0
+  index: -1
+Meteor/Volcano_Base_WILD1_00
+  rotate: false
+  xy: 1852, 733
+  size: 115, 115
+  orig: 276, 276
+  offset: 93, 121
+  index: -1
+Meteor/Volcano_Base_WILD1_02
+  rotate: false
+  xy: 1718, 646
+  size: 133, 179
+  orig: 276, 276
+  offset: 88, 75
+  index: -1
+Meteor/Volcano_Base_WILD1_04
+  rotate: false
+  xy: 1613, 28
+  size: 186, 186
+  orig: 276, 276
+  offset: 90, 90
+  index: -1
+Meteor/Volcano_Base_WILD1_06
+  rotate: false
+  xy: 223, 47
+  size: 188, 188
+  orig: 276, 276
+  offset: 88, 88
+  index: -1
+Meteor/Volcano_Base_WILD1_08
+  rotate: false
+  xy: 452, 60
+  size: 190, 177
+  orig: 276, 276
+  offset: 86, 99
+  index: -1
+Meteor/Volcano_Base_WILD1_10
+  rotate: false
+  xy: 1, 1721
+  size: 275, 266
+  orig: 276, 276
+  offset: 1, 10
+  index: -1
+Meteor/Volcano_Base_WILD1_12
+  rotate: false
+  xy: 1, 1216
+  size: 269, 261
+  orig: 276, 276
+  offset: 5, 15
+  index: -1
+Meteor/Volcano_Base_WILD1_14
+  rotate: false
+  xy: 1045, 1740
+  size: 240, 247
+  orig: 276, 276
+  offset: 31, 29
+  index: -1
+Meteor/Volcano_Base_WILD1_16
+  rotate: false
+  xy: 794, 1483
+  size: 252, 250
+  orig: 276, 276
+  offset: 20, 26
+  index: -1
+Meteor/Volcano_Base_WILD1_18
+  rotate: false
+  xy: 1, 971
+  size: 267, 244
+  orig: 276, 276
+  offset: 9, 32
+  index: -1
+Meteor/Volcano_Base_WILD1_20
+  rotate: false
+  xy: 1, 1478
+  size: 272, 242
+  orig: 276, 276
+  offset: 0, 34
+  index: -1
+Meteor/Volcano_Base_WILD1_22
+  rotate: false
+  xy: 1, 730
+  size: 266, 240
+  orig: 276, 276
+  offset: 10, 36
+  index: -1
+Meteor/Volcano_Base_WILD1_24
+  rotate: false
+  xy: 268, 685
+  size: 238, 228
+  orig: 276, 276
+  offset: 38, 48
+  index: -1
+Meteor/Volcano_Base_WILD1_26
+  rotate: false
+  xy: 1017, 1004
+  size: 257, 238
+  orig: 276, 276
+  offset: 19, 38
+  index: -1
+Meteor/Volcano_Base_WILD1_28
+  rotate: false
+  xy: 529, 926
+  size: 250, 242
+  orig: 276, 276
+  offset: 25, 34
+  index: -1
+Meteor/Volcano_Base_WILD1_30
+  rotate: false
+  xy: 805, 1243
+  size: 241, 239
+  orig: 276, 276
+  offset: 32, 37
+  index: -1
+Meteor/Volcano_Base_WILD1_32
+  rotate: false
+  xy: 780, 926
+  size: 236, 242
+  orig: 276, 276
+  offset: 38, 34
+  index: -1
+Meteor/Volcano_Base_WILD1_34
+  rotate: false
+  xy: 1047, 1503
+  size: 231, 236
+  orig: 276, 276
+  offset: 44, 40
+  index: -1
+Meteor/Volcano_Base_WILD1_36
+  rotate: false
+  xy: 1506, 1301
+  size: 228, 225
+  orig: 276, 276
+  offset: 48, 51
+  index: -1
+Meteor/Volcano_Base_WILD1_38
+  rotate: false
+  xy: 1279, 1508
+  size: 224, 231
+  orig: 276, 276
+  offset: 52, 45
+  index: -1
+Meteor/Volcano_Base_WILD1_40
+  rotate: false
+  xy: 1733, 1762
+  size: 222, 225
+  orig: 276, 276
+  offset: 53, 51
+  index: -1
+Meteor/Volcano_Base_WILD1_42
+  rotate: false
+  xy: 1498, 826
+  size: 220, 225
+  orig: 276, 276
+  offset: 52, 51
+  index: -1
+Meteor/Volcano_Base_WILD1_44
+  rotate: false
+  xy: 1724, 1535
+  size: 228, 225
+  orig: 276, 276
+  offset: 48, 51
+  index: -1
+Meteor/Volcano_Base_WILD1_46
+  rotate: false
+  xy: 1515, 1075
+  size: 219, 225
+  orig: 276, 276
+  offset: 53, 51
+  index: -1
+Meteor/Volcano_Base_WILD1_48
+  rotate: false
+  xy: 1719, 849
+  size: 218, 225
+  orig: 276, 276
+  offset: 55, 51
+  index: -1
+Meteor/Volcano_Base_WILD1_50
+  rotate: false
+  xy: 1504, 1527
+  size: 219, 229
+  orig: 276, 276
+  offset: 52, 47
+  index: -1
+Meteor/Volcano_Base_WILD1_52
+  rotate: false
+  xy: 1286, 1757
+  size: 224, 230
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD1_54
+  rotate: false
+  xy: 1128, 119
+  size: 200, 213
+  orig: 276, 276
+  offset: 50, 45
+  index: -1
+Meteor/Volcano_Base_WILD_01
+  rotate: false
+  xy: 1800, 35
+  size: 187, 179
+  orig: 276, 276
+  offset: 65, 76
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_00
+  rotate: false
+  xy: 912, 49
+  size: 199, 205
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_04
+  rotate: false
+  xy: 452, 238
+  size: 217, 221
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_08
+  rotate: false
+  xy: 1496, 556
+  size: 221, 223
+  orig: 276, 276
+  offset: 49, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_12
+  rotate: false
+  xy: 970, 476
+  size: 221, 224
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_16
+  rotate: false
+  xy: 1, 54
+  size: 221, 225
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_20
+  rotate: false
+  xy: 1735, 1310
+  size: 220, 224
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_24
+  rotate: false
+  xy: 468, 460
+  size: 224, 224
+  orig: 276, 276
+  offset: 47, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_28
+  rotate: false
+  xy: 227, 236
+  size: 224, 224
+  orig: 276, 276
+  offset: 46, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_32
+  rotate: false
+  xy: 741, 701
+  size: 231, 224
+  orig: 276, 276
+  offset: 39, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_36
+  rotate: false
+  xy: 741, 476
+  size: 228, 224
+  orig: 276, 276
+  offset: 42, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_40
+  rotate: false
+  xy: 507, 690
+  size: 233, 223
+  orig: 276, 276
+  offset: 36, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_44
+  rotate: false
+  xy: 239, 461
+  size: 228, 223
+  orig: 276, 276
+  offset: 41, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_48
+  rotate: false
+  xy: 1, 504
+  size: 237, 225
+  orig: 276, 276
+  offset: 33, 45
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_52
+  rotate: false
+  xy: 1266, 780
+  size: 231, 223
+  orig: 276, 276
+  offset: 38, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_56
+  rotate: false
+  xy: 1284, 1052
+  size: 230, 225
+  orig: 276, 276
+  offset: 40, 44
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_60
+  rotate: false
+  xy: 1266, 556
+  size: 229, 223
+  orig: 276, 276
+  offset: 40, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_64
+  rotate: false
+  xy: 1, 280
+  size: 225, 223
+  orig: 276, 276
+  offset: 45, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_68
+  rotate: false
+  xy: 1735, 1086
+  size: 219, 223
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_72
+  rotate: false
+  xy: 1718, 422
+  size: 219, 223
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_76
+  rotate: false
+  xy: 1192, 333
+  size: 218, 222
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_80
+  rotate: false
+  xy: 693, 253
+  size: 218, 222
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_84
+  rotate: false
+  xy: 912, 255
+  size: 215, 220
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXCycle_88
+  rotate: false
+  xy: 670, 47
+  size: 199, 205
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_00
+  rotate: false
+  xy: 1411, 349
+  size: 201, 206
+  orig: 276, 276
+  offset: 49, 45
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_02
+  rotate: false
+  xy: 1613, 215
+  size: 201, 206
+  orig: 276, 276
+  offset: 49, 45
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_04
+  rotate: false
+  xy: 1411, 142
+  size: 201, 206
+  orig: 276, 276
+  offset: 49, 45
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_06
+  rotate: false
+  xy: 782, 1734
+  size: 262, 253
+  orig: 276, 276
+  offset: 14, 21
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_08
+  rotate: false
+  xy: 271, 1186
+  size: 268, 254
+  orig: 276, 276
+  offset: 8, 21
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_10
+  rotate: false
+  xy: 277, 1717
+  size: 265, 270
+  orig: 276, 276
+  offset: 7, 4
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_12
+  rotate: false
+  xy: 540, 1169
+  size: 264, 272
+  orig: 276, 276
+  offset: 10, 1
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_14
+  rotate: false
+  xy: 269, 914
+  size: 259, 271
+  orig: 276, 276
+  offset: 11, 2
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_16
+  rotate: false
+  xy: 532, 1442
+  size: 261, 274
+  orig: 276, 276
+  offset: 12, 1
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_18
+  rotate: false
+  xy: 274, 1441
+  size: 257, 275
+  orig: 276, 276
+  offset: 14, 0
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_20
+  rotate: false
+  xy: 543, 1717
+  size: 238, 270
+  orig: 276, 276
+  offset: 33, 3
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_22
+  rotate: false
+  xy: 1047, 1270
+  size: 236, 232
+  orig: 276, 276
+  offset: 40, 37
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_24
+  rotate: false
+  xy: 1511, 1761
+  size: 221, 226
+  orig: 276, 276
+  offset: 50, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_26
+  rotate: false
+  xy: 1017, 778
+  size: 248, 225
+  orig: 276, 276
+  offset: 28, 46
+  index: -1
+Meteor/Volcano_Base_WILD_FXTrig_28
+  rotate: false
+  xy: 1284, 1278
+  size: 221, 229
+  orig: 276, 276
+  offset: 49, 45
+  index: -1

@@ -1,0 +1,384 @@
+{
+"skeleton": { "hash": "hbxt3rSOKqSTotUmZxPQRm5jl4k", "spine": "3.8.99", "x": -138, "y": -138, "width": 882.46, "height": 884.12 },
+"bones": [
+	{ "name": "root" },
+	{ "name": "star", "parent": "root" }
+],
+"slots": [
+	{ "name": "images/Volcano_Base_WILD1_00000", "bone": "root", "attachment": "images/Volcano_Base_WILD1_00000" },
+	{ "name": "images/Volcano_Base_WILD_01", "bone": "star", "attachment": "images/Volcano_Base_WILD_01" },
+	{ "name": "A01", "bone": "star", "attachment": "images/A01", "blend": "additive" },
+	{ "name": "A1", "bone": "star", "attachment": "images/A01", "blend": "additive" },
+	{ "name": "A2", "bone": "star", "attachment": "images/A01", "blend": "additive" },
+	{ "name": "Cycle", "bone": "root", "attachment": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_88" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"A01": {
+				"images/A01": {
+					"x": 373.94,
+					"y": 375.6,
+					"scaleX": 0.75,
+					"scaleY": 8,
+					"rotation": -45,
+					"width": 32,
+					"height": 128
+				}
+			},
+			"A1": {
+				"images/A01": {
+					"x": 269.36,
+					"y": 315.84,
+					"scaleX": 0.5,
+					"scaleY": 6,
+					"rotation": -45,
+					"width": 32,
+					"height": 128
+				}
+			},
+			"A2": {
+				"images/A01": {
+					"x": 308.37,
+					"y": 276.83,
+					"scaleX": 0.3,
+					"scaleY": 6,
+					"rotation": -45,
+					"width": 32,
+					"height": 128
+				}
+			},
+			"Cycle": {
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_00": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_02": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_04": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_06": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_08": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_10": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_12": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_14": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_16": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_18": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_20": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_22": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_24": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_26": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_28": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_30": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_32": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_34": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_36": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_38": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_40": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_42": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_44": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_46": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_48": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_50": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_52": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_54": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_56": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_58": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_60": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_62": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_64": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_66": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_68": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_70": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_72": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_74": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_76": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_78": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_80": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_82": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_84": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_86": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_88": { "width": 276, "height": 276 }
+			},
+			"images/Volcano_Base_WILD1_00000": {
+				"images/Volcano_Base_WILD1_00000": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00001": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00002": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00003": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00004": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00005": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00006": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00007": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00008": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00009": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00010": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00011": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00012": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00013": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00014": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00015": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00016": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00017": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00018": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00019": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00020": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00021": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00022": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00023": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00024": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00025": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00026": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00027": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00028": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00029": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00030": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00031": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00032": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00033": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00034": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00035": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00036": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00037": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00038": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00039": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00040": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00041": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00042": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00043": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00044": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00045": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00046": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00047": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00048": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00049": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00050": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00051": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00052": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00053": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00054": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00055": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00056": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00057": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00058": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00059": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00060": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00061": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00062": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00063": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00064": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00065": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00066": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00067": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00068": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00069": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00070": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00071": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00072": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00073": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00074": { "width": 276, "height": 276 },
+				"images/Volcano_Base_WILD1_00075": { "width": 276, "height": 276 }
+			},
+			"images/Volcano_Base_WILD_01": {
+				"images/Volcano_Base_WILD_01": { "width": 276, "height": 276 }
+			}
+		}
+	}
+],
+"events": {
+	"shake": {}
+},
+"animations": {
+	"Cycle": {
+		"slots": {
+			"A01": {
+				"color": [
+					{ "color": "ffffff00" }
+				]
+			},
+			"A1": {
+				"color": [
+					{ "color": "ffffff00" }
+				]
+			},
+			"A2": {
+				"color": [
+					{ "color": "ffffff00" }
+				]
+			},
+			"Cycle": {
+				"attachment": [
+					{ "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_00" },
+					{ "time": 0.0333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_02" },
+					{ "time": 0.0667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_04" },
+					{ "time": 0.1, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_06" },
+					{ "time": 0.1333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_08" },
+					{ "time": 0.1667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_10" },
+					{ "time": 0.2, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_12" },
+					{ "time": 0.2333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_14" },
+					{ "time": 0.2667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_16" },
+					{ "time": 0.3, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_18" },
+					{ "time": 0.3333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_20" },
+					{ "time": 0.3667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_22" },
+					{ "time": 0.4, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_24" },
+					{ "time": 0.4333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_26" },
+					{ "time": 0.4667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_28" },
+					{ "time": 0.5, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_30" },
+					{ "time": 0.5333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_32" },
+					{ "time": 0.5667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_34" },
+					{ "time": 0.6, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_36" },
+					{ "time": 0.6333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_38" },
+					{ "time": 0.6667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_40" },
+					{ "time": 0.7, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_42" },
+					{ "time": 0.7333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_44" },
+					{ "time": 0.7667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_46" },
+					{ "time": 0.8, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_48" },
+					{ "time": 0.8333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_50" },
+					{ "time": 0.8667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_52" },
+					{ "time": 0.9, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_54" },
+					{ "time": 0.9333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_56" },
+					{ "time": 0.9667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_58" },
+					{ "time": 1, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_60" },
+					{ "time": 1.0333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_62" },
+					{ "time": 1.0667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_64" },
+					{ "time": 1.1, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_66" },
+					{ "time": 1.1333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_68" },
+					{ "time": 1.1667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_70" },
+					{ "time": 1.2, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_72" },
+					{ "time": 1.2333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_74" },
+					{ "time": 1.2667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_76" },
+					{ "time": 1.3, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_78" },
+					{ "time": 1.3333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_80" },
+					{ "time": 1.3667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_82" },
+					{ "time": 1.4, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_84" },
+					{ "time": 1.4333, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_86" },
+					{ "time": 1.4667, "name": "images/Volcano_Base_WILD_FXCycle/Volcano_Base_WILD_FXCycle_88" }
+				]
+			},
+			"images/Volcano_Base_WILD_01": {
+				"color": [
+					{ "color": "ffffff00" }
+				]
+			}
+		}
+	},
+	"trig": {
+		"slots": {
+			"A01": {
+				"color": [
+					{ "color": "ffffffff" },
+					{ "time": 0.8333, "color": "ffffff00" }
+				]
+			},
+			"A1": {
+				"color": [
+					{ "color": "ffffffff" },
+					{ "time": 0.8333, "color": "ffffff00" }
+				]
+			},
+			"A2": {
+				"color": [
+					{ "color": "ffffffff" },
+					{ "time": 0.8333, "color": "ffffff00" }
+				]
+			},
+			"Cycle": {
+				"color": [
+					{ "color": "ffffff00" }
+				]
+			},
+			"images/Volcano_Base_WILD1_00000": {
+				"attachment": [
+					{ "time": 0.5333, "name": "images/Volcano_Base_WILD1_00001" },
+					{ "time": 0.5667, "name": "images/Volcano_Base_WILD1_00002" },
+					{ "time": 0.6, "name": "images/Volcano_Base_WILD1_00003" },
+					{ "time": 0.6333, "name": "images/Volcano_Base_WILD1_00004" },
+					{ "time": 0.6667, "name": "images/Volcano_Base_WILD1_00005" },
+					{ "time": 0.7, "name": "images/Volcano_Base_WILD1_00006" },
+					{ "time": 0.7333, "name": "images/Volcano_Base_WILD1_00007" },
+					{ "time": 0.7667, "name": "images/Volcano_Base_WILD1_00008" },
+					{ "time": 0.8, "name": "images/Volcano_Base_WILD1_00009" },
+					{ "time": 0.8333, "name": "images/Volcano_Base_WILD1_00010" },
+					{ "time": 0.8667, "name": "images/Volcano_Base_WILD1_00011" },
+					{ "time": 0.9, "name": "images/Volcano_Base_WILD1_00012" },
+					{ "time": 0.9333, "name": "images/Volcano_Base_WILD1_00013" },
+					{ "time": 0.9667, "name": "images/Volcano_Base_WILD1_00014" },
+					{ "time": 1, "name": "images/Volcano_Base_WILD1_00015" },
+					{ "time": 1.0333, "name": "images/Volcano_Base_WILD1_00016" },
+					{ "time": 1.0667, "name": "images/Volcano_Base_WILD1_00017" },
+					{ "time": 1.1, "name": "images/Volcano_Base_WILD1_00018" },
+					{ "time": 1.1333, "name": "images/Volcano_Base_WILD1_00019" },
+					{ "time": 1.1667, "name": "images/Volcano_Base_WILD1_00020" },
+					{ "time": 1.2, "name": "images/Volcano_Base_WILD1_00021" },
+					{ "time": 1.2333, "name": "images/Volcano_Base_WILD1_00022" },
+					{ "time": 1.2667, "name": "images/Volcano_Base_WILD1_00023" },
+					{ "time": 1.3, "name": "images/Volcano_Base_WILD1_00024" },
+					{ "time": 1.3333, "name": "images/Volcano_Base_WILD1_00025" },
+					{ "time": 1.3667, "name": "images/Volcano_Base_WILD1_00026" },
+					{ "time": 1.4, "name": "images/Volcano_Base_WILD1_00027" },
+					{ "time": 1.4333, "name": "images/Volcano_Base_WILD1_00028" },
+					{ "time": 1.4667, "name": "images/Volcano_Base_WILD1_00029" },
+					{ "time": 1.5, "name": "images/Volcano_Base_WILD1_00030" },
+					{ "time": 1.5333, "name": "images/Volcano_Base_WILD1_00031" },
+					{ "time": 1.5667, "name": "images/Volcano_Base_WILD1_00032" },
+					{ "time": 1.6, "name": "images/Volcano_Base_WILD1_00033" },
+					{ "time": 1.6333, "name": "images/Volcano_Base_WILD1_00034" },
+					{ "time": 1.6667, "name": "images/Volcano_Base_WILD1_00035" },
+					{ "time": 1.7, "name": "images/Volcano_Base_WILD1_00036" },
+					{ "time": 1.7333, "name": "images/Volcano_Base_WILD1_00037" },
+					{ "time": 1.7667, "name": "images/Volcano_Base_WILD1_00038" },
+					{ "time": 1.8, "name": "images/Volcano_Base_WILD1_00039" },
+					{ "time": 1.8333, "name": "images/Volcano_Base_WILD1_00040" },
+					{ "time": 1.8667, "name": "images/Volcano_Base_WILD1_00041" },
+					{ "time": 1.9, "name": "images/Volcano_Base_WILD1_00042" },
+					{ "time": 1.9333, "name": "images/Volcano_Base_WILD1_00043" },
+					{ "time": 1.9667, "name": "images/Volcano_Base_WILD1_00044" },
+					{ "time": 2, "name": "images/Volcano_Base_WILD1_00045" },
+					{ "time": 2.0333, "name": "images/Volcano_Base_WILD1_00046" },
+					{ "time": 2.0667, "name": "images/Volcano_Base_WILD1_00047" },
+					{ "time": 2.1, "name": "images/Volcano_Base_WILD1_00048" },
+					{ "time": 2.1333, "name": "images/Volcano_Base_WILD1_00049" },
+					{ "time": 2.1667, "name": "images/Volcano_Base_WILD1_00050" },
+					{ "time": 2.2, "name": "images/Volcano_Base_WILD1_00051" },
+					{ "time": 2.2333, "name": "images/Volcano_Base_WILD1_00052" },
+					{ "time": 2.2667, "name": "images/Volcano_Base_WILD1_00053" },
+					{ "time": 2.3, "name": "images/Volcano_Base_WILD1_00054" },
+					{ "time": 2.3333, "name": "images/Volcano_Base_WILD1_00055" },
+					{ "time": 2.3667, "name": "images/Volcano_Base_WILD1_00056" },
+					{ "time": 2.4, "name": "images/Volcano_Base_WILD1_00057" },
+					{ "time": 2.4333, "name": "images/Volcano_Base_WILD1_00058" },
+					{ "time": 2.4667, "name": "images/Volcano_Base_WILD1_00059" },
+					{ "time": 2.5, "name": "images/Volcano_Base_WILD1_00060" },
+					{ "time": 2.5333, "name": "images/Volcano_Base_WILD1_00061" },
+					{ "time": 2.5667, "name": "images/Volcano_Base_WILD1_00062" },
+					{ "time": 2.6, "name": "images/Volcano_Base_WILD1_00063" },
+					{ "time": 2.6333, "name": "images/Volcano_Base_WILD1_00064" },
+					{ "time": 2.6667, "name": "images/Volcano_Base_WILD1_00065" },
+					{ "time": 2.7, "name": "images/Volcano_Base_WILD1_00066" },
+					{ "time": 2.7333, "name": "images/Volcano_Base_WILD1_00067" },
+					{ "time": 2.7667, "name": "images/Volcano_Base_WILD1_00068" },
+					{ "time": 2.8, "name": "images/Volcano_Base_WILD1_00069" },
+					{ "time": 2.8333, "name": "images/Volcano_Base_WILD1_00070" },
+					{ "time": 2.8667, "name": "images/Volcano_Base_WILD1_00071" },
+					{ "time": 2.9, "name": "images/Volcano_Base_WILD1_00072" },
+					{ "time": 2.9333, "name": "images/Volcano_Base_WILD1_00073" },
+					{ "time": 2.9667, "name": "images/Volcano_Base_WILD1_00074" },
+					{ "time": 3, "name": "images/Volcano_Base_WILD1_00075" }
+				]
+			},
+			"images/Volcano_Base_WILD_01": {
+				"color": [
+					{ "time": 0.8333, "color": "ffffffff" },
+					{ "time": 0.9, "color": "ffffff00" }
+				]
+			}
+		},
+		"bones": {
+			"star": {
+				"translate": [
+					{ "x": 800, "y": 800 },
+					{ "time": 0.8333 }
+				]
+			}
+		},
+		"events": [
+			{ "time": 0.8333, "name": "shake" }
+		]
+	}
+}
+}

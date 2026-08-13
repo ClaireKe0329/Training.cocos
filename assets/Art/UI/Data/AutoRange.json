@@ -1,0 +1,29 @@
+[
+ {
+  "AutoRange": 10,
+ },
+ {
+  "AutoRange": 25,
+ },
+ {
+  "AutoRange": 50,
+ },
+ {
+  "AutoRange": 100,
+ },
+ {
+  "AutoRange": 250,
+ },
+ {
+  "AutoRange": 500,
+ },
+ {
+  "AutoRange": 750,
+ },
+ {
+  "AutoRange": 1000,
+ },
+ {
+  "AutoRange": 9999,
+ },
+]

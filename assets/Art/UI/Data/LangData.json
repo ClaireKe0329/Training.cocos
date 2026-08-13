@@ -1,0 +1,68 @@
+[
+	{
+		"langType": "tw",
+		"win": "贏分",
+		"balance": "餘額",
+		"totalBet": "總押注",
+		"auto": "自動旋轉",
+		"paytable": "賠率表",
+		"gameRules": "遊戲規則",
+		"start": "開始",
+		"history": "歷史紀錄"
+	},
+	{
+		"langType": "cn",
+		"win": "赢分",
+		"balance": "余额",
+		"totalBet": "总投注",
+		"auto": "自动旋转",
+		"paytable": "赔率表",
+		"gameRules": "游戏规则",
+		"start": "开始",
+		"history": "历史记录"
+	},
+	{
+		"langType": "en",
+		"win": "WIN",
+		"balance": "BALANCE",
+		"totalBet": "TOTAL BET",
+		"auto": "AUTO",
+		"paytable": "PAYTABLE",
+		"gameRules": "GAME RULES",
+		"start": "START",
+		"history": "HISTORY"
+	},
+	{
+		"langType": "vn",
+		"win": "ĐIỂM THẮNG",
+		"balance": "SỐ DƯ",
+		"totalBet": "TỔNG MỨC ĐẶT",
+		"auto": "XOAY TỰ ĐỘNG",
+		"paytable": "BẢNG TỶ LỆ",
+		"gameRules": "QUY TẮC TRÒ CHƠI",
+		"start": "BẮT ĐẦU",
+		"history": "LỊCH SỬ GHI CHÉP"
+	},
+	{
+		"langType": "jp",
+		"win": "賞金",
+		"balance": "残高",
+		"totalBet": "総BET額",
+		"auto": "AUTO",
+		"paytable": "配当表",
+		"gameRules": "遊び方",
+		"start": "スタート",
+		"history": "プレイ履歴"
+	},
+	{
+		"langType": "th",
+		"win": "รางวัล",
+		"balance": "คงเหลือ",
+		"totalBet": "ยอดเดิมพัน",
+		"auto": "หมุนอัตโนมัติ",
+		"paytable": "อัตราชนะ",
+		"gameRules": "อธิบายเกม",
+		"start": "เริ่ม",
+		"history": "ประวัติการเล่น"
+	}
+]
