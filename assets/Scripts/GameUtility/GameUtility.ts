@@ -1,7 +1,13 @@
 export class GameUtility
 {
+    private static readonly _slotColumnCount: number = 5;
     private static readonly _slotRowCount: number = 3;
     private static readonly _reelBufferUnitCount: number = 2;
+
+    public static GetSlotColumnCount(): number
+    {
+        return this._slotColumnCount;
+    }
 
     public static GetSlotRowCount(): number
     {

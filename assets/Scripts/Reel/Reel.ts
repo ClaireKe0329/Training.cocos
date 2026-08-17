@@ -6,7 +6,6 @@ import { SlotUnit } from './SlotUnit';
 const { ccclass, property } = _decorator;
 
 const POSITION_CENTER_INDEX: number = Math.floor( GameUtility.GetReelSlotUnitCount() / 2 );
-const PREVIEW_STOP_SYMBOLS: SymbolType[] = [ SymbolType.M1, SymbolType.A, SymbolType.M2 ];
 
 enum ReelState
 {
@@ -35,12 +34,6 @@ export class Reel extends Component
     @property( { type: CCFloat, min: 0.01 } )
     public ShockDuration: number = 0.12;
 
-    @property
-    public PreviewOnStart: boolean = true;
-
-    @property( { type: CCFloat, min: 0.1 } )
-    public PreviewSpinDuration: number = 2;
-
     private _state: ReelState = ReelState.Idle;
     private _currentCenter: number = 0;
     private _stopSymbols: SymbolType[] = [];
@@ -55,14 +48,6 @@ export class Reel extends Component
     protected start(): void
     {
         this.ResetReel();
-
-        if ( !this.PreviewOnStart )
-        {
-            return;
-        }
-
-        this.scheduleOnce( (): void => this.StartSpin(), 0.5 );
-        this.scheduleOnce( (): void => this.StopSpin( PREVIEW_STOP_SYMBOLS ), 0.5 + this.PreviewSpinDuration );
     }
 
     protected update( deltaTime: number ): void
@@ -80,11 +65,6 @@ export class Reel extends Component
             default:
                 break;
         }
-    }
-
-    protected onDisable(): void
-    {
-        this.unscheduleAllCallbacks();
     }
 
     public StartSpin(): void
