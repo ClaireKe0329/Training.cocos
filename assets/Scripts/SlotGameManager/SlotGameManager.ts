@@ -29,7 +29,7 @@ export class SlotGameManager extends Component
 
     public get CanSkip(): boolean
     {
-        return this.IsSpinning && !( this.ReelController?.IsStopping ?? false );
+        return this.ReelController?.CanSkip ?? false;
     }
 
     public StartSpin(): void

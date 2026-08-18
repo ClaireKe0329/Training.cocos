@@ -15,6 +15,8 @@ export class ReelController extends Component
     public ReelStopInterval: number = 0.15;
     private _isRunning: boolean = false;
     private _isStopping: boolean = false;
+    private _isSkipRequested: boolean = false;
+    private _hasPendingReelStop: boolean = false;
     private _reelResults: SymbolType[][] = [];
 
     public get IsRunning(): boolean
@@ -25,6 +27,11 @@ export class ReelController extends Component
     public get IsStopping(): boolean
     {
         return this._isStopping;
+    }
+
+    public get CanSkip(): boolean
+    {
+        return this._isRunning && this._hasPendingReelStop && !this._isSkipRequested;
     }
 
     protected update(): void
@@ -51,6 +58,8 @@ export class ReelController extends Component
         }
 
         this._isRunning = true;
+        this._isSkipRequested = false;
+        this._hasPendingReelStop = true;
 
         for ( const reel of this.Reels )
         {
@@ -62,16 +71,6 @@ export class ReelController extends Component
 
     public StopSpin( reelResults: SymbolType[][] ): boolean
     {
-        return this.stopSpin( reelResults, false );
-    }
-
-    public SkipSpin( reelResults: SymbolType[][] ): boolean
-    {
-        return this.stopSpin( reelResults, true );
-    }
-
-    private stopSpin( reelResults: SymbolType[][], isSkip: boolean = false ): boolean
-    {
         if ( !this._isRunning || this._isStopping || !this.isValidReelResults( reelResults ) )
         {
             return false;
@@ -79,13 +78,32 @@ export class ReelController extends Component
 
         this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
         this._isStopping = true;
-        this.startReelStopSequence( isSkip );
+        this.startReelStopSequence();
         return true;
     }
 
-    private startReelStopSequence( isSkip: boolean ): void
+    public SkipSpin( reelResults: SymbolType[][] ): boolean
     {
-        const reelStopSequence: Generator<boolean, boolean, unknown> = this.reelStop( isSkip );
+        if ( !this.CanSkip || !this.isValidReelResults( reelResults ) )
+        {
+            return false;
+        }
+
+        this._isSkipRequested = true;
+
+        if ( !this._isStopping )
+        {
+            this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
+            this._isStopping = true;
+            this.startReelStopSequence();
+        }
+
+        return true;
+    }
+
+    private startReelStopSequence(): void
+    {
+        const reelStopSequence: Generator<boolean, boolean, unknown> = this.reelStop();
         const stopNextReel = (): void =>
         {
             if ( reelStopSequence.next().value )
@@ -93,26 +111,25 @@ export class ReelController extends Component
                 return;
             }
 
-            if ( !isSkip )
-            {
-                this.unschedule( stopNextReel );
-            }
+            this._hasPendingReelStop = false;
+            this.unschedule( stopNextReel );
         };
 
         stopNextReel();
-        if ( !isSkip )
+
+        if ( this._hasPendingReelStop )
         {
             this.schedule( stopNextReel, this.ReelStopInterval );
         }
     }
 
-    private *reelStop( isSkip: boolean ): Generator<boolean, boolean, unknown>
+    private *reelStop(): Generator<boolean, boolean, unknown>
     {
         for ( let reelIndex: number = 0; reelIndex < this.Reels.length; reelIndex++ )
         {
             this.Reels[ reelIndex ].StopSpin( this._reelResults[ reelIndex ] );
 
-            if ( !isSkip && reelIndex < this.Reels.length - 1 )
+            if ( !this._isSkipRequested && reelIndex < this.Reels.length - 1 )
             {
                 yield true;
             }
@@ -135,6 +152,8 @@ export class ReelController extends Component
     {
         this._isRunning = false;
         this._isStopping = false;
+        this._isSkipRequested = false;
+        this._hasPendingReelStop = false;
         this._reelResults = [];
     }
 }
