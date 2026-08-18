@@ -5,14 +5,6 @@ import { Reel } from './Reel';
 
 const { ccclass, property } = _decorator;
 
-const PREVIEW_REEL_RESULTS: SymbolType[][] = [
-    [ SymbolType.M1, SymbolType.A, SymbolType.M2 ],
-    [ SymbolType.M3, SymbolType.K, SymbolType.Q ],
-    [ SymbolType.M4, SymbolType.J, SymbolType.A ],
-    [ SymbolType.Q, SymbolType.M2, SymbolType.K ],
-    [ SymbolType.A, SymbolType.M1, SymbolType.J ],
-];
-
 @ccclass( 'ReelController' )
 export class ReelController extends Component
 {
@@ -21,26 +13,18 @@ export class ReelController extends Component
 
     @property( { type: CCFloat, min: 0 } )
     public ReelStopInterval: number = 0.15;
-
-    @property
-    public PreviewOnStart: boolean = true;
-
-    @property( { type: CCFloat, min: 0.1 } )
-    public PreviewSpinDuration: number = 2;
-
     private _isRunning: boolean = false;
     private _isStopping: boolean = false;
     private _reelResults: SymbolType[][] = [];
 
-    protected start(): void
+    public get IsRunning(): boolean
     {
-        if ( !this.PreviewOnStart )
-        {
-            return;
-        }
+        return this._isRunning;
+    }
 
-        this.scheduleOnce( (): void => this.StartSpin(), 0.5 );
-        this.scheduleOnce( (): void => this.StopSpin( PREVIEW_REEL_RESULTS ), 0.5 + this.PreviewSpinDuration );
+    public get IsStopping(): boolean
+    {
+        return this._isStopping;
     }
 
     protected update(): void
@@ -59,11 +43,11 @@ export class ReelController extends Component
         this.resetSpinState();
     }
 
-    public StartSpin(): void
+    public StartSpin(): boolean
     {
         if ( this._isRunning || this.Reels.length !== GameUtility.GetSlotColumnCount() )
         {
-            return;
+            return false;
         }
 
         this._isRunning = true;
@@ -72,23 +56,36 @@ export class ReelController extends Component
         {
             reel.StartSpin();
         }
+
+        return true;
     }
 
-    public StopSpin( reelResults: SymbolType[][] ): void
+    public StopSpin( reelResults: SymbolType[][] ): boolean
+    {
+        return this.stopSpin( reelResults, false );
+    }
+
+    public SkipSpin( reelResults: SymbolType[][] ): boolean
+    {
+        return this.stopSpin( reelResults, true );
+    }
+
+    private stopSpin( reelResults: SymbolType[][], isSkip: boolean = false ): boolean
     {
         if ( !this._isRunning || this._isStopping || !this.isValidReelResults( reelResults ) )
         {
-            return;
+            return false;
         }
 
         this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
         this._isStopping = true;
-        this.startReelStopSequence();
+        this.startReelStopSequence( isSkip );
+        return true;
     }
 
-    private startReelStopSequence(): void
+    private startReelStopSequence( isSkip: boolean ): void
     {
-        const reelStopSequence: Generator<boolean, boolean, unknown> = this.reelStop();
+        const reelStopSequence: Generator<boolean, boolean, unknown> = this.reelStop( isSkip );
         const stopNextReel = (): void =>
         {
             if ( reelStopSequence.next().value )
@@ -96,20 +93,26 @@ export class ReelController extends Component
                 return;
             }
 
-            this.unschedule( stopNextReel );
+            if ( !isSkip )
+            {
+                this.unschedule( stopNextReel );
+            }
         };
 
         stopNextReel();
-        this.schedule( stopNextReel, this.ReelStopInterval );
+        if ( !isSkip )
+        {
+            this.schedule( stopNextReel, this.ReelStopInterval );
+        }
     }
 
-    private *reelStop(): Generator<boolean, boolean, unknown>
+    private *reelStop( isSkip: boolean ): Generator<boolean, boolean, unknown>
     {
         for ( let reelIndex: number = 0; reelIndex < this.Reels.length; reelIndex++ )
         {
             this.Reels[ reelIndex ].StopSpin( this._reelResults[ reelIndex ] );
 
-            if ( reelIndex < this.Reels.length - 1 )
+            if ( !isSkip && reelIndex < this.Reels.length - 1 )
             {
                 yield true;
             }
