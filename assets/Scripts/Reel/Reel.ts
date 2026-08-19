@@ -6,6 +6,7 @@ import { FSMachine } from '../GameUtility/FSMachine';
 
 const { ccclass, property } = _decorator;
 
+// 取得陣列中心的 SlotUnit Index，作為 SlotUnit 以 Reel 中心點排列的位置基準
 const POSITION_CENTER_INDEX: number = Math.floor( GameUtility.GetReelSlotUnitCount() / 2 );
 
 enum ReelState
@@ -230,6 +231,7 @@ export class Reel extends Component
     {
         for ( let index: number = 0; index < this.SlotUnits.length; index++ )
         {
+            // 根據 Reel 的垂直位移量與 SlotUnit 距離中心的格數計算 Y 軸位置
             const positionY: number = this._reelVerticalOffset + this.SymbolHeight * ( POSITION_CENTER_INDEX - index );
             this.SlotUnits[ index ].node.setPosition( 0, positionY, 0 );
         }
