@@ -38,16 +38,16 @@ export class Reel extends Component
     // Reel 目前在單一 Symbol 高度內的垂直位移量
     private _reelVerticalOffset: number = 0;
 
-    // 儲存目前停輪時要顯示的 Symbol 結果
+    // 目前停輪時要顯示的 Symbol 結果
     private _stopSymbols: SymbolType[] = [];
 
-    // 紀錄停輪結果是否已移動至最終可見盤面位置
+    // 停輪結果是否已移動至最終可見盤面位置
     private _hasStopResultAligned: boolean = false;
 
-    // 紀錄目前已放入多少個停輪 Symbol
+    // 目前已放入的停輪 Symbol 數量
     private _stopSymbolCount: number = 0;
 
-    // 紀錄 Shock 動畫目前經過的時間
+    // Shock 動畫目前經過的時間
     private _shockElapsedTime: number = 0;
 
     // 管理 Reel 目前的狀態
