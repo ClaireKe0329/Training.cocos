@@ -1,7 +1,6 @@
 import { _decorator, Component } from 'cc';
 import { ReelController } from '../Reel/ReelController';
 import { SymbolType } from '../GameData/SymbolType';
-import { GameConfig } from '../GameUtility/GameConfig';
 const { ccclass, property } = _decorator;
 
 // 暫時使用的固定五軸停輪結果
@@ -20,9 +19,6 @@ export class SlotGameManager extends Component
     @property( { type: ReelController } )
     public ReelController: ReelController | null = null;
 
-    // 目前一局使用的五軸停輪結果
-    private _spinResult: SymbolType[][] = [];
-
     // 目前是否正在進行 Spin
     public get IsSpinning(): boolean
     {
@@ -35,7 +31,7 @@ export class SlotGameManager extends Component
         return this.ReelController?.CanSkip ?? false;
     }
 
-    // 啟動 Spin 並排程 Normal Stop
+    // 啟動 Spin 並將暫時的固定結果交給 ReelController
     public StartSpin(): void
     {
         if ( !this.ReelController || !this.ReelController.StartSpin() )
@@ -43,14 +39,11 @@ export class SlotGameManager extends Component
             return;
         }
 
-        this._spinResult = TEMP_REEL_RESULTS;
-
-        // 暫時使用固定的時間觸發 StopSpin
-        this.unschedule( this.normalStopSpin );
-        this.scheduleOnce( this.normalStopSpin, GameConfig.GetInstance().SpinDuration );
+        // 未來改由 SlotProcessor 提供 Spin Result
+        this.ReelController.SetSpinResult( TEMP_REEL_RESULTS );
     }
 
-    // 取消 Normal Stop 排程並要求剩餘 Reel 快速停輪
+    // 將玩家的 Skip 操作交給 ReelController 判斷
     public SkipSpin(): void
     {
         if ( !this.CanSkip )
@@ -58,14 +51,6 @@ export class SlotGameManager extends Component
             return;
         }
 
-        // Skip 後不再等待原本的 Normal Stop 時間
-        this.unschedule( this.normalStopSpin );
-        this.ReelController?.SkipSpin( this._spinResult );
-    }
-
-    // 將目前停輪結果交給 ReelController 開始 Normal Stop
-    private normalStopSpin(): void
-    {
-        this.ReelController?.StopSpin( this._spinResult );
+        this.ReelController?.SkipSpin();
     }
 }

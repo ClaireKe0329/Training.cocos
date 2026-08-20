@@ -9,6 +9,7 @@ const { ccclass, property } = _decorator;
 @ccclass( 'ReelController' )
 export class ReelController extends Component
 {
+    // 由 Controller 管理的所有 Reel
     @property( { type: [ Reel ] } )
     public Reels: Reel[] = [];
 
@@ -18,42 +19,64 @@ export class ReelController extends Component
     // 目前是否已開始進行停輪流程
     private _isStopping: boolean = false;
 
-    // 玩家是否已要求 Skip 剩餘停輪間隔
+    // 是否已由自動停輪切換為快速停輪
     private _isSkipRequested: boolean = false;
 
     // 是否還有 Reel 尚未收到 StopSpin Command
     private _hasPendingReelStop: boolean = false;
 
-    // 目前一局五軸 Reel 的最終停輪結果
-    private _reelResults: SymbolType[][] = [];
+    // 目前這一局 Reel 已累計的運轉時間
+    private _spinElapsedTime: number = 0;
 
+    // 目前一局五軸 Reel 的最終停輪結果
+    private _reelResults: SymbolType[][] | null = null;
+
+    // Controller 是否仍在處理本局 Reel Spin
     public get IsRunning(): boolean
     {
         return this._isRunning;
     }
 
+    // Controller 是否已開始進行停輪流程
     public get IsStopping(): boolean
     {
         return this._isStopping;
     }
 
+    // Spin 期間是否允許玩家送出 Skip 操作
     public get CanSkip(): boolean
     {
         return this._isRunning && this._hasPendingReelStop && !this._isSkipRequested;
     }
 
-    // 檢查所有 Reel 是否已完成停輪，若完成則重設 Spin 狀態
-    protected update(): void
+    // 依目前階段處理 Spin 計時或等待所有 Reel 運轉完成，最後重設狀態
+    protected update( deltaTime: number ): void
     {
-        if ( !this._isStopping || this.Reels.some( ( reel: Reel ): boolean => reel.IsRunning ) )
+        // 沒有進行中的 Spin 時不處理本幀
+        if ( !this._isRunning )
         {
             return;
         }
 
+        // 尚未開始停輪時累計運轉時間，並檢查目前是否符合停輪條件
+        if ( !this._isStopping )
+        {
+            this._spinElapsedTime += deltaTime;
+            this.tryStopSpin();
+            return;
+        }
+
+        // 已開始停輪時等待所有 Reel 完成 Stop 與 Shock 並回到 Idle
+        if ( this.Reels.some( ( reel: Reel ): boolean => reel.IsRunning ) )
+        {
+            return;
+        }
+
+        // 所有 Reel 都完成後才清除本局 Controller 狀態
         this.resetSpinState();
     }
 
-    // Component 停用時取消尚未執行的排程並重設 Spin 狀態
+    // Component 停用時取消停輪間隔的排程並重設 Spin 狀態
     protected onDisable(): void
     {
         this.unscheduleAllCallbacks();
@@ -69,8 +92,11 @@ export class ReelController extends Component
         }
 
         this._isRunning = true;
+        this._isStopping = false;
         this._isSkipRequested = false;
         this._hasPendingReelStop = true;
+        this._spinElapsedTime = 0;
+        this._reelResults = null;
 
         for ( const reel of this.Reels )
         {
@@ -80,52 +106,64 @@ export class ReelController extends Component
         return true;
     }
 
-    // 設定停輪結果並開始依序通知各 Reel 停輪
-    public StopSpin( reelResults: SymbolType[][] ): boolean
+    // 保存有效停輪結果
+    public SetSpinResult( reelResults: SymbolType[][] ): boolean
     {
+        // 尚未 Spin、已開始停輪或結果格式錯誤時不保存結果
         if ( !this._isRunning || this._isStopping || !this.isValidReelResults( reelResults ) )
         {
             return false;
         }
 
         this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
-        this._isStopping = true;
-        this.runReelStopSequence();
         return true;
     }
 
-    // 要求剩餘尚未收到 StopSpin Command 的 Reel 快速開始停輪
-    public SkipSpin( reelResults: SymbolType[][] ): boolean
+    // 有效結果存在時切換為快速停輪
+    public SkipSpin(): boolean
     {
-        if ( !this.CanSkip || !this.isValidReelResults( reelResults ) )
+        // 沒有有效結果時不保留這次 Skip，讓 Reel 繼續運轉
+        if ( !this.CanSkip || this._reelResults === null )
         {
             return false;
         }
 
         this._isSkipRequested = true;
-
-        // 尚未開始正常停輪流程時，先保存結果並立即開始停輪
-        if ( !this._isStopping )
-        {
-            this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
-            this._isStopping = true;
-            this.runReelStopSequence();
-        }
-
         return true;
     }
 
-    // 依序通知每一軸 Reel 停輪，Skip 時略過剩餘停輪間隔
-    private async runReelStopSequence(): Promise<void>
+    // 自動停輪時等待最低 Spin 時間，快速停輪則直接開始停輪
+    private tryStopSpin(): void
+    {
+        // 尚未 Spin、已開始停輪或沒有有效結果時不啟動停輪
+        if ( !this._isRunning || this._isStopping || this._reelResults === null )
+        {
+            return;
+        }
+
+        // 自動停輪必須等到最低運轉時間
+        if ( !this._isSkipRequested && this._spinElapsedTime < GameConfig.GetInstance().SpinDuration )
+        {
+            return;
+        }
+
+        this._isStopping = true;
+        this.runReelStopSequence( this._reelResults );
+    }
+
+    // 依序通知每一軸 Reel 停輪，快速停輪會略過剩餘間隔
+    private async runReelStopSequence( reelResults: SymbolType[][] ): Promise<void>
     {
         for ( let reelIndex: number = 0; reelIndex < this.Reels.length; reelIndex++ )
         {
-            this.Reels[ reelIndex ].StopSpin( this._reelResults[ reelIndex ] );
+            this.Reels[ reelIndex ].StopSpin( reelResults[ reelIndex ] );
 
-            // Normal Stop 時等待停輪間隔，Skip 時讓剩餘 Reel 直接收到 StopSpin Command
-            if ( !this._isSkipRequested && reelIndex < this.Reels.length - 1 )
+            let nowWaitingTime: number = 0;
+            // 自動停輪時等待停軸間隔，快速停輪直接處理下一軸
+            while ( !this._isSkipRequested && nowWaitingTime < GameConfig.GetInstance().ReelStopInterval && reelIndex < this.Reels.length - 1 )
             {
-                await this.waitTime( GameConfig.GetInstance().ReelStopInterval );
+                await this.waitTime( 0.05 );
+                nowWaitingTime += 0.05;
             }
         }
 
@@ -151,7 +189,8 @@ export class ReelController extends Component
         this._isStopping = false;
         this._isSkipRequested = false;
         this._hasPendingReelStop = false;
-        this._reelResults = [];
+        this._spinElapsedTime = 0;
+        this._reelResults = null;
     }
 
     // 等待指定秒數後繼續執行目前非同步流程
