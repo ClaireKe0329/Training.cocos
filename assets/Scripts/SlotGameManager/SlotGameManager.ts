@@ -1,16 +1,9 @@
 import { _decorator, Component } from 'cc';
-import { ReelController } from '../Reel/ReelController';
+import { SpinResultData } from '../GameData/SpinResultData';
 import { SymbolType } from '../GameData/SymbolType';
+import { ReelController } from '../Reel/ReelController';
+import { ISpinResultProvider, LocalSpinResultProvider } from './LocalSpinResultProvider';
 const { ccclass, property } = _decorator;
-
-// 暫時使用的固定五軸停輪結果
-const TEMP_REEL_RESULTS: SymbolType[][] = [
-    [ SymbolType.M1, SymbolType.A, SymbolType.M2 ],
-    [ SymbolType.M3, SymbolType.K, SymbolType.Q ],
-    [ SymbolType.M4, SymbolType.J, SymbolType.A ],
-    [ SymbolType.Q, SymbolType.M2, SymbolType.K ],
-    [ SymbolType.A, SymbolType.M1, SymbolType.J ],
-];
 
 @ccclass( 'SlotGameManager' )
 export class SlotGameManager extends Component
@@ -18,6 +11,9 @@ export class SlotGameManager extends Component
     // 負責多軸 Spin 與 Stop 流程的 ReelController
     @property( { type: ReelController } )
     public ReelController: ReelController | null = null;
+
+    // 提供目前單局使用的 Spin Result
+    private _spinResultProvider: ISpinResultProvider = new LocalSpinResultProvider();
 
     // 目前是否正在進行 Spin
     public get IsSpinning(): boolean
@@ -31,7 +27,7 @@ export class SlotGameManager extends Component
         return this.ReelController?.CanSkip ?? false;
     }
 
-    // 啟動 Spin 並將暫時的固定結果交給 ReelController
+    // 啟動 Spin 並將 Provider 產生的結果交給 ReelController
     public StartSpin(): void
     {
         if ( !this.ReelController || !this.ReelController.StartSpin() )
@@ -39,18 +35,19 @@ export class SlotGameManager extends Component
             return;
         }
 
-        // 未來改由 SlotProcessor 提供 Spin Result
-        this.ReelController.SetSpinResult( TEMP_REEL_RESULTS );
+        const spinResult: SpinResultData = this._spinResultProvider.GetSpinResult();
+        console.log( '[SlotGameManager] 取得盤面結果', spinResult.SlotGrids.map( ( reelSymbols: SymbolType[] ) => reelSymbols.map( ( symbol: SymbolType ) => SymbolType[ symbol ] ) ) );
+        this.ReelController.SetSpinResult( spinResult.SlotGrids );
     }
 
     // 將玩家的 Skip 操作交給 ReelController 判斷
     public SkipSpin(): void
     {
-        if ( !this.CanSkip )
+        if ( !this.CanSkip || !this.ReelController )
         {
             return;
         }
 
-        this.ReelController?.SkipSpin();
+        this.ReelController.SkipSpin();
     }
 }
