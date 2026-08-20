@@ -1,6 +1,7 @@
-import { _decorator, Component, CCFloat } from 'cc';
+import { _decorator, Component } from 'cc';
 import { ReelController } from '../Reel/ReelController';
 import { SymbolType } from '../GameData/SymbolType';
+import { GameConfig } from '../GameUtility/GameConfig';
 const { ccclass, property } = _decorator;
 
 // 暫時使用的固定五軸停輪結果
@@ -18,10 +19,6 @@ export class SlotGameManager extends Component
     // 負責多軸 Spin 與 Stop 流程的 ReelController
     @property( { type: ReelController } )
     public ReelController: ReelController | null = null;
-
-    // Normal Stop 前的 Spin 持續秒數
-    @property( { type: CCFloat, min: 0.1 } )
-    public SpinDuration: number = 2;
 
     // 目前一局使用的五軸停輪結果
     private _spinResult: SymbolType[][] = [];
@@ -50,7 +47,7 @@ export class SlotGameManager extends Component
 
         // 暫時使用固定的時間觸發 StopSpin
         this.unschedule( this.normalStopSpin );
-        this.scheduleOnce( this.normalStopSpin, this.SpinDuration );
+        this.scheduleOnce( this.normalStopSpin, GameConfig.GetInstance().SpinDuration );
     }
 
     // 取消 Normal Stop 排程並要求剩餘 Reel 快速停輪
@@ -72,5 +69,3 @@ export class SlotGameManager extends Component
         this.ReelController?.StopSpin( this._spinResult );
     }
 }
-
-

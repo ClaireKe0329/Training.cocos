@@ -1,5 +1,6 @@
 import { _decorator, CCFloat, Component } from 'cc';
 import { SYMBOL_TYPE_LIST, SymbolType } from '../GameData/SymbolType';
+import { GameConfig } from '../GameUtility/GameConfig';
 import { GameUtility } from '../GameUtility/GameUtility';
 import { SlotUnit } from './SlotUnit';
 import { FSMachine } from '../GameUtility/FSMachine';
@@ -26,15 +27,6 @@ export class Reel extends Component
 
     @property( { type: CCFloat, min: 1 } )
     public SymbolHeight: number = 150;
-
-    @property( { type: CCFloat, min: 1 } )
-    public SpinSpeed: number = 900;
-
-    @property( { type: CCFloat, min: 0 } )
-    public ShockDistance: number = 18;
-
-    @property( { type: CCFloat, min: 0.01 } )
-    public ShockDuration: number = 0.12;
 
     // Reel 目前在單一 Symbol 高度內的垂直位移量
     private _reelVerticalOffset: number = 0;
@@ -130,7 +122,7 @@ export class Reel extends Component
     // 更新 Reel 位置
     private updateUnitPosition( deltaTime: number ): void
     {
-        this._reelVerticalOffset -= this.SpinSpeed * deltaTime;
+        this._reelVerticalOffset -= GameConfig.GetInstance().SpinSpeed * deltaTime;
 
         // 當 Reel 移動超過一格時，搬移最後一格 SlotUnit 並更新 Symbol
         if ( this._reelVerticalOffset <= 0 )
@@ -212,10 +204,11 @@ export class Reel extends Component
         this._shockElapsedTime += deltaTime;
 
         // 將 Shock 經過時間轉換為 0 ~ 1 的進度
-        const shockRatio: number = Math.min( this._shockElapsedTime / this.ShockDuration, 1 );
+        const gameConfig: GameConfig = GameConfig.GetInstance();
+        const shockRatio: number = Math.min( this._shockElapsedTime / gameConfig.ShockDuration, 1 );
 
         // 使用 Sin 曲線讓 Reel 先向下位移再回到原始位置
-        this._reelVerticalOffset = -this.ShockDistance * Math.sin( Math.PI * shockRatio );
+        this._reelVerticalOffset = -gameConfig.ShockDistance * Math.sin( Math.PI * shockRatio );
         this.fixingPosition();
 
         if ( shockRatio >= 1 )

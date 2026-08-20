@@ -1,5 +1,6 @@
-import { _decorator, CCFloat, Component } from 'cc';
+import { _decorator, Component } from 'cc';
 import { SymbolType } from '../GameData/SymbolType';
+import { GameConfig } from '../GameUtility/GameConfig';
 import { GameUtility } from '../GameUtility/GameUtility';
 import { Reel } from './Reel';
 
@@ -10,9 +11,6 @@ export class ReelController extends Component
 {
     @property( { type: [ Reel ] } )
     public Reels: Reel[] = [];
-
-    @property( { type: CCFloat, min: 0 } )
-    public ReelStopInterval: number = 0.15;
 
     // 目前是否正在進行 Reel Spin
     private _isRunning: boolean = false;
@@ -127,7 +125,7 @@ export class ReelController extends Component
             // Normal Stop 時等待停輪間隔，Skip 時讓剩餘 Reel 直接收到 StopSpin Command
             if ( !this._isSkipRequested && reelIndex < this.Reels.length - 1 )
             {
-                await this.waitTime( this.ReelStopInterval );
+                await this.waitTime( GameConfig.GetInstance().ReelStopInterval );
             }
         }
 
