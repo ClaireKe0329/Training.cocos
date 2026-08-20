@@ -1,89 +1,85 @@
+export interface IStateEvent
+{
+    OnEnter?(): void;
+    OnUpdate( deltaTime: number ): void;
+    OnExit?(): void;
+}
+
 /**
  * 有限狀態機
  */
-export class FSMachine<T>
+export class FSMachine<TState>
 {
-    //執行一次的事件
-    private _onceEvent: Map<T, ( dt: number ) => Promise<T>> = new Map<T, ( dt: number ) => Promise<T>>();
-    //會不斷執行的事件
-    private _foreverEvent: Map<T, ( dt: number ) => Promise<T>> = new Map<T, ( dt: number ) => Promise<T>>();
-    //目前狀態
-    private _currentState: T;
-    //下個狀態
-    private _nextState: T;
-    //轉換旗標
-    private transit: boolean = false;
-    constructor( initState: T )
+    private _stateEventMap: Map<TState, IStateEvent> = new Map<TState, IStateEvent>();
+
+    private _currentState: TState;
+
+    private _isStarted: boolean = false;
+
+    constructor( initState: TState )
     {
         this._currentState = initState;
-        this._nextState = initState;
     }
 
-    //新增執行一次的事件
-    public AddOnceEvent( event: T, fun: () => Promise<T> )
+    // 註冊狀態對應事件
+    public RegisterStateEvent( state: TState, event: IStateEvent ): void
     {
-        this._onceEvent.set( event, fun );
+        this._stateEventMap.set( state, event );
     }
 
-    //刪除執行一次的事件
-    public RemoveOnceEvent( event: T )
+    // 刪除狀態對應事件
+    public RemoveStateEvent( state: TState ): void
     {
-        if ( this._onceEvent.has( event ) )
+        this._stateEventMap.delete( state );
+    }
+
+    // 啟動狀態機並執行初始狀態的 OnEnter
+    public Start(): void
+    {
+        if ( this._isStarted )
         {
-            this._onceEvent.delete( event );
+            return;
+        }
+
+        this._isStarted = true;
+        this._stateEventMap.get( this._currentState )?.OnEnter?.();
+    }
+
+    // 更新目前狀態
+    public Tick( deltaTime: number ): TState
+    {
+        if ( !this._isStarted )
+        {
+            return this._currentState;
+        }
+
+        this._stateEventMap.get( this._currentState )?.OnUpdate( deltaTime );
+        return this._currentState;
+    }
+
+    // 切換狀態並依序執行 OnExit 與 OnEnter
+    public ChangeState( state: TState ): void
+    {
+        if ( this._currentState === state )
+        {
+            return;
+        }
+
+        if ( this._isStarted )
+        {
+            this._stateEventMap.get( this._currentState )?.OnExit?.();
+        }
+
+        this._currentState = state;
+
+        if ( this._isStarted )
+        {
+            this._stateEventMap.get( this._currentState )?.OnEnter?.();
         }
     }
 
-    //新增不斷執行的事件
-    public AddForeverEvent( event: T, fun: () => Promise<T> )
-    {
-        this._foreverEvent.set( event, fun );
-    }
-
-    //刪除不斷執行的事件
-    public RemoveForeverEvent( event: T )
-    {
-        if ( this._foreverEvent.has( event ) )
-        {
-            this._foreverEvent.delete( event );
-        }
-    }
-
-    //狀態更新
-    public async Tick( dt: number )
-    {
-        if ( this.transit )
-        {
-            this.CurrentState = this.NextState;
-            this.transit = false;
-            this._onceEvent.has( this.CurrentState ) && await this._onceEvent.get( this.CurrentState )( dt );
-        }
-        else
-        {
-            this._foreverEvent.has( this.CurrentState ) && await this._foreverEvent.get( this.CurrentState )( dt );
-        }
-
-        return this.CurrentState;
-    }
-    //設定下一個狀態
-    set NextState( State: T )
-    {
-        this._nextState = State;
-        this.transit = true;
-    }
-    //取得下一個狀態
-    get NextState(): T
-    {
-        return this._nextState;
-    }
-    //取得目前狀態
-    set CurrentState( State: T )
-    {
-        this._currentState = State;
-    }
-
-    //取得目前的狀態
-    get CurrentState(): T
+    // 取得目前狀態
+    public get CurrentState(): TState
     {
         return this._currentState;
     }
