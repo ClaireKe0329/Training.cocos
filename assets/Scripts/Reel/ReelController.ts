@@ -67,10 +67,17 @@ export class ReelController extends Component
         this.completeSpin();
     }
 
-    // Component 停用時取消停輪間隔的排程並重設 Spin 狀態
+    // Component 停用時取消停輪間隔的排程，並同步結束進行中的 Reel Spin
     protected onDisable(): void
     {
         this.unscheduleAllCallbacks();
+
+        if ( this._isSpinRunning )
+        {
+            this.completeSpin();
+            return;
+        }
+
         this.resetSpinState();
     }
 
