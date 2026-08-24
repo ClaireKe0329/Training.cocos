@@ -13,14 +13,14 @@ export class GameUIController extends Component
     @property( { type: Button } )
     public StopButton: Button | null = null;
 
-    // 提供 Spin 狀態與操作入口的 SlotGameManager
+    // 提供 Round 狀態與操作入口的 SlotGameManager
     @property( { type: SlotGameManager } )
     public SlotGameManager: SlotGameManager | null = null;
 
-    // 上一次套用至 UI 的 Spin 狀態
-    private _lastIsSpinning: boolean | null = null;
-    // 上一次套用至 UI 的 Skip 狀態
-    private _lastCanSkip: boolean | null = null;
+    // 上一次套用至 UI 的 Round 狀態
+    private _lastIsRoundRunning: boolean | null = null;
+    // 上一次套用至 UI 的 Round Skip 狀態
+    private _lastCanSkipRound: boolean | null = null;
 
     // 每幀檢查按鈕狀態是否需要更新
     protected update(): void
@@ -41,31 +41,31 @@ export class GameUIController extends Component
     {
         this.SpinButton?.node.off( Button.EventType.CLICK, this.onSpinButtonClick, this );
         this.StopButton?.node.off( Button.EventType.CLICK, this.onStopButtonClick, this );
-        this._lastIsSpinning = null;
-        this._lastCanSkip = null;
+        this._lastIsRoundRunning = null;
+        this._lastCanSkipRound = null;
     }
 
-    // 將玩家的 Spin 操作交給 SlotGameManager
+    // 將玩家的 Spin 操作交給 SlotGameManager 啟動 Round
     private onSpinButtonClick(): void
     {
         if ( !this.SlotGameManager )
         {
             return;
         }
-        this.SlotGameManager.StartSpin();
+        this.SlotGameManager.StartRound();
     }
 
-    // 將玩家的 Skip 操作交給 SlotGameManager
+    // 將玩家的 Skip 操作交給 SlotGameManager 處理目前 Round
     private onStopButtonClick(): void
     {
         if ( !this.SlotGameManager )
         {
             return;
         }
-        this.SlotGameManager.SkipSpin();
+        this.SlotGameManager.SkipRound();
     }
 
-    // 依照目前 Spin 與 Skip 狀態更新按鈕顯示
+    // 依照目前 Round 與 Skip 狀態更新按鈕顯示
     private updateButtonState(): void
     {
         // 必要元件尚未設定完成時不更新 UI
@@ -74,23 +74,22 @@ export class GameUIController extends Component
             return;
         }
 
-        const isSpinning: boolean = this.SlotGameManager.IsSpinning;
-        const canSkip: boolean = this.SlotGameManager.CanSkip;
+        const isRoundRunning: boolean = this.SlotGameManager.IsRoundRunning;
+        const canSkipRound: boolean = this.SlotGameManager.CanSkipRound;
 
-        // Spin 與 Skip 狀態沒有改變時不重複更新按鈕
-        if ( this._lastIsSpinning === isSpinning && this._lastCanSkip === canSkip )
+        // Round 與 Skip 狀態沒有改變時不重複更新按鈕
+        if ( this._lastIsRoundRunning === isRoundRunning && this._lastCanSkipRound === canSkipRound )
         {
             return;
         }
 
-        this._lastIsSpinning = isSpinning;
-        this._lastCanSkip = canSkip;
+        this._lastIsRoundRunning = isRoundRunning;
+        this._lastCanSkipRound = canSkipRound;
 
-        // Spin 中顯示 Stop Button，並依目前狀態決定是否允許 Skip
-        this.SpinButton.node.active = !isSpinning;
-        this.StopButton.node.active = isSpinning;
-        this.StopButton.interactable = canSkip;
+        // Round 進行中顯示 Stop Button，並依目前狀態決定是否允許 Skip
+        this.SpinButton.node.active = !isRoundRunning;
+        this.StopButton.node.active = isRoundRunning;
+        this.StopButton.interactable = canSkipRound;
     }
 }
-
 

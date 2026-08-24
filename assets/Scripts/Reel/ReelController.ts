@@ -14,7 +14,7 @@ export class ReelController extends Component
     public Reels: Reel[] = [];
 
     // 目前是否正在進行 Reel Spin
-    private _isRunning: boolean = false;
+    private _isSpinRunning: boolean = false;
 
     // 目前是否已開始進行停輪流程
     private _isStopping: boolean = false;
@@ -31,29 +31,20 @@ export class ReelController extends Component
     // 目前一局五軸 Reel 的最終停輪結果
     private _reelResults: SymbolType[][] | null = null;
 
-    // Controller 是否仍在處理本局 Reel Spin
-    public get IsRunning(): boolean
-    {
-        return this._isRunning;
-    }
-
-    // Controller 是否已開始進行停輪流程
-    public get IsStopping(): boolean
-    {
-        return this._isStopping;
-    }
+    // Reel Spin 全部完成時的通知
+    private _onSpinComplete: ( () => void ) | null = null;
 
     // Spin 期間是否允許玩家送出 Skip 操作
-    public get CanSkip(): boolean
+    public get CanSkipSpin(): boolean
     {
-        return this._isRunning && this._hasPendingReelStop && !this._isSkipRequested;
+        return this._isSpinRunning && this._hasPendingReelStop && !this._isSkipRequested;
     }
 
     // 依目前階段處理 Spin 計時或等待所有 Reel 運轉完成，最後重設狀態
     protected update( deltaTime: number ): void
     {
         // 沒有進行中的 Spin 時不處理本幀
-        if ( !this._isRunning )
+        if ( !this._isSpinRunning )
         {
             return;
         }
@@ -73,7 +64,7 @@ export class ReelController extends Component
         }
 
         // 所有 Reel 都完成後才清除本局 Controller 狀態
-        this.resetSpinState();
+        this.completeSpin();
     }
 
     // Component 停用時取消停輪間隔的排程並重設 Spin 狀態
@@ -84,19 +75,20 @@ export class ReelController extends Component
     }
 
     // 啟動所有 Reel 進行 Spin
-    public StartSpin(): boolean
+    public StartSpin( onSpinComplete: () => void ): boolean
     {
-        if ( this._isRunning || this.Reels.length !== GameUtility.GetSlotColumnCount() )
+        if ( this._isSpinRunning || this.Reels.length !== GameUtility.GetSlotColumnCount() )
         {
             return false;
         }
 
-        this._isRunning = true;
+        this._isSpinRunning = true;
         this._isStopping = false;
         this._isSkipRequested = false;
         this._hasPendingReelStop = true;
         this._spinElapsedTime = 0;
         this._reelResults = null;
+        this._onSpinComplete = onSpinComplete;
 
         for ( const reel of this.Reels )
         {
@@ -110,7 +102,7 @@ export class ReelController extends Component
     public SetSpinResult( reelResults: SymbolType[][] ): boolean
     {
         // 尚未 Spin、已開始停輪或結果格式錯誤時不保存結果
-        if ( !this._isRunning || this._isStopping || !this.isValidReelResults( reelResults ) )
+        if ( !this._isSpinRunning || this._isStopping || !this.isValidReelResults( reelResults ) )
         {
             return false;
         }
@@ -123,7 +115,7 @@ export class ReelController extends Component
     public SkipSpin(): boolean
     {
         // 沒有有效結果時不保留這次 Skip，讓 Reel 繼續運轉
-        if ( !this.CanSkip || this._reelResults === null )
+        if ( !this.CanSkipSpin || this._reelResults === null )
         {
             return false;
         }
@@ -136,7 +128,7 @@ export class ReelController extends Component
     private tryStopSpin(): void
     {
         // 尚未 Spin、已開始停輪或沒有有效結果時不啟動停輪
-        if ( !this._isRunning || this._isStopping || this._reelResults === null )
+        if ( !this._isSpinRunning || this._isStopping || this._reelResults === null )
         {
             return;
         }
@@ -182,15 +174,24 @@ export class ReelController extends Component
         return reelResults.every( ( stopSymbols: SymbolType[] ): boolean => stopSymbols.length === GameUtility.GetSlotRowCount() );
     }
 
+    // 重設狀態後通知上層 Reel Spin 已完整結束
+    private completeSpin(): void
+    {
+        const onSpinComplete: ( () => void ) | null = this._onSpinComplete;
+        this.resetSpinState();
+        onSpinComplete?.();
+    }
+
     // 重設目前 Spin 與 Stop 流程相關狀態
     private resetSpinState(): void
     {
-        this._isRunning = false;
+        this._isSpinRunning = false;
         this._isStopping = false;
         this._isSkipRequested = false;
         this._hasPendingReelStop = false;
         this._spinElapsedTime = 0;
         this._reelResults = null;
+        this._onSpinComplete = null;
     }
 
     // 等待指定秒數後繼續執行目前非同步流程

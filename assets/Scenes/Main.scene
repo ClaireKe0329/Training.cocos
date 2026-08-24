@@ -80,6 +80,9 @@
         "__id__": 11
       },
       {
+        "__id__": 66
+      },
+      {
         "__id__": 13
       },
       {
@@ -495,7 +498,9 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "ReelController": null,
+    "SlotProcessor": {
+      "__id__": 65
+    },
     "_id": "f6EWvr9CpAYLJm41vReGtY"
   },
   {
@@ -991,7 +996,7 @@
   {
     "__type__": "cc.TargetOverrideInfo",
     "source": {
-      "__id__": 12
+      "__id__": 65
     },
     "sourceInfo": null,
     "propertyPath": [
@@ -1215,5 +1220,63 @@
   {
     "__type__": "cc.PostSettingsInfo",
     "_toneMappingType": 0
+  },
+  {
+    "__type__": "9013a/gy2dG3Izfew7GL3P9",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 66
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "ReelController": null,
+    "_id": "vvE6Fxf0wUmZvVPiijnfWw"
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "SlotProcessor",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "_parent": {
+      "__id__": 2
+    },
+    "_children": [],
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 65
+      }
+    ],
+    "_prefab": null,
+    "_lpos": {
+      "__type__": "cc.Vec3",
+      "x": -640,
+      "y": -360.00000000000006,
+      "z": 0
+    },
+    "_lrot": {
+      "__type__": "cc.Quat",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 1
+    },
+    "_lscale": {
+      "__type__": "cc.Vec3",
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "_mobility": 0,
+    "_layer": 1073741824,
+    "_euler": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_id": "DHDzAUJ91E-7V7jF9WoE3w"
   }
 ]
