@@ -43,7 +43,7 @@ export class GameConfig
 
         const config = configJson.json as IGameConfig;
 
-        // 避免速度或時間設定造成 Reel 無法正常運作
+        // 檢查 Reel 運作所需的基本數值設定
         if ( config.SpinSpeed <= 0 || config.ShockDistance < 0 || config.ShockDuration <= 0 || config.ReelStopInterval < 0 || config.SpinDuration < 0 )
         {
             throw new Error( '[GameConfig] Reel 的速度、距離或時間設定不合法。' );

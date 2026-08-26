@@ -19,7 +19,7 @@ export class ReelController extends Component
     // 目前是否已開始進行停輪流程
     private _isStopping: boolean = false;
 
-    // 是否已由自動停輪切換為快速停輪
+    // 玩家是否已要求快速停輪
     private _isSkipRequested: boolean = false;
 
     // 是否還有 Reel 尚未收到 StopSpin Command
@@ -28,7 +28,7 @@ export class ReelController extends Component
     // 目前這一局 Reel 已累計的運轉時間
     private _spinElapsedTime: number = 0;
 
-    // 目前一局五軸 Reel 的最終停輪結果
+    // 目前一局各 Reel 的最終停輪結果
     private _reelResults: SymbolType[][] | null = null;
 
     // Reel Spin 全部完成時的通知
@@ -121,7 +121,7 @@ export class ReelController extends Component
     // 有效結果存在時切換為快速停輪
     public SkipSpin(): boolean
     {
-        // 沒有有效結果時不保留這次 Skip，讓 Reel 繼續運轉
+        // 目前不可 Skip 或尚未取得停輪結果時不處理
         if ( !this.CanSkipSpin || this._reelResults === null )
         {
             return false;

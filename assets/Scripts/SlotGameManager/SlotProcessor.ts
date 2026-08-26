@@ -25,7 +25,7 @@ export class SlotProcessor extends Component
     // 目前是否正在處理單一 Round
     private _isRoundRunning: boolean = false;
 
-    // 目前是否正在處理單一 Round
+    // 取得目前 Round 是否正在執行
     public get IsRoundRunning(): boolean
     {
         return this._isRoundRunning;
@@ -49,7 +49,7 @@ export class SlotProcessor extends Component
 
         const spinResult: SpinResultData | null = this._spinResultProvider.GetSpinResult( FIXED_BET );
 
-        // 沒有合法結果時維持 Round 與 Reel 運轉，等待後續 retry 或 timeout 處理
+        // 沒有可用結果時不設定停輪結果，Reel 維持運轉
         if ( spinResult === null )
         {
             return true;
@@ -57,7 +57,7 @@ export class SlotProcessor extends Component
 
         const isSpinResultAccepted: boolean = this.ReelController.SetSpinResult( spinResult.SlotGrids );
 
-        // 結果未被接受時不保存本局結果，讓 Reel 繼續運轉並等待後續處理
+        // 結果未被接受時不保存本局結果，Reel 維持運轉
         if ( !isSpinResultAccepted )
         {
             console.warn( '[SlotProcessor] Spin Result 未被 ReelController 接受，Reel 將繼續運轉。' );

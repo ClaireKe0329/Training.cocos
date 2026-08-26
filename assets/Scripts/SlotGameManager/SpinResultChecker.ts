@@ -6,7 +6,7 @@ import { GameConfig } from '../GameUtility/GameConfig';
 // 依照設定的 Payline 判斷盤面中所有中獎線
 export class SpinResultChecker
 {
-    // 每種 Symbol 的最低連線數由自身倍率設定中的最小 key 決定
+    // 檢查所有 Payline 並回傳中獎的連線結果
     public CheckLineResults( slotGrids: SymbolType[][] ): ILineResultData[]
     {
         const paylines: number[][] = GameConfig.GetInstance().Paylines;
@@ -56,6 +56,7 @@ export class SpinResultChecker
             }
         }
 
+        // 以倍率設定中的最小連線數作為此 Symbol 的中獎門檻
         const minimumMatchCount: number = Math.min( ...Object.keys( symbolMultiplier.Multipliers ).map( ( configuredMatchCount: string ): number => Number( configuredMatchCount ) ) );
 
         if ( matchCount < minimumMatchCount )
@@ -63,7 +64,7 @@ export class SpinResultChecker
             return null;
         }
 
-        // Checker 只保存命中內容，Score 由 ScoreCalculator 接續回填
+        // 先建立連線結果，Score 由 ScoreCalculator 計算
         const lineResult: ILineResultData = {
             PaylineIndex: paylineIndex,
             SymbolType: firstSymbol,

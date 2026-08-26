@@ -14,7 +14,7 @@ export class MainScene extends Component
     {
         if ( this.ConfigJson === null )
         {
-            throw new Error( '[MainScene] config.json is not assigned.' );
+            throw new Error( '[MainScene] 尚未設定 config.json。' );
         }
 
         GameConfig.GetInstance().SetConfig( this.ConfigJson );

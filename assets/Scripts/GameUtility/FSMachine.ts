@@ -45,7 +45,7 @@ export class FSMachine<TState>
         this._stateEventMap.get( this._currentState )?.OnEnter?.();
     }
 
-    // 更新目前狀態
+    // 執行目前狀態的 OnUpdate
     public Tick( deltaTime: number ): TState
     {
         if ( !this._isStarted )

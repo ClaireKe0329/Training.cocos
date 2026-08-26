@@ -29,7 +29,7 @@ export class LocalSpinResultProvider implements ISpinResultProvider
         return new SpinResultData( slotGrids, lineResults, totalScore );
     }
 
-    // 隨機產生單局盤面結果
+    // 隨機產生單局盤面
     private generateSlotGrids(): SymbolType[][]
     {
         const slotGrids: SymbolType[][] = [];

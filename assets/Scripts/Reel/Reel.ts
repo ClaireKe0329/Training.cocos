@@ -63,7 +63,7 @@ export class Reel extends Component
         this._fsMachine.Tick( deltaTime );
     }
 
-    // 開始 Reel Spin
+    // 讓 Reel 從 Idle 進入 Run 狀態
     public StartSpin(): void
     {
         if ( this._fsMachine.CurrentState !== ReelState.Idle || this.SlotUnits.length !== GameUtility.GetReelSlotUnitCount() )
@@ -132,7 +132,7 @@ export class Reel extends Component
         this._stopSymbolCount = 0;
     }
 
-    // ReadyToStop 狀態依序放入停輪結果並完成盤面對齊
+    // ReadyToStop 狀態依序放入停輪結果，全部放入後進入 Stop
     private updateReadyToStop( deltaTime: number ): void
     {
         if ( this.moveReel( deltaTime ) )
