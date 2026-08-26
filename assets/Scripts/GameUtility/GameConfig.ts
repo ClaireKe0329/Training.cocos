@@ -1,7 +1,7 @@
 import { JsonAsset } from 'cc';
 import { GameUtility } from './GameUtility';
 import { SYMBOL_TYPE_LIST, SymbolType } from '../GameData/SymbolType';
-import { ISymbolMultiplier, WIN_MATCH_COUNTS } from '../GameData/WinRule';
+import { ISymbolMultiplier } from '../GameData/SymbolMultiplier';
 
 export interface IGameConfig
 {
@@ -111,6 +111,8 @@ export class GameConfig
             throw new Error( '[GameConfig] 至少需要設定一條 Payline。' );
         }
 
+        const configuredPaylineKeys: Set<string> = new Set<string>();
+
         for ( const payline of paylines )
         {
             // 一條 Payline 必須包含每一軸的 Row Index
@@ -127,10 +129,19 @@ export class GameConfig
                     throw new Error( '[GameConfig] Payline 包含無效的 Row Index。' );
                 }
             }
+
+            const paylineKey: string = payline.join( ',' );
+
+            if ( configuredPaylineKeys.has( paylineKey ) )
+            {
+                throw new Error( `[GameConfig] Payline 設定重複：${paylineKey}。` );
+            }
+
+            configuredPaylineKeys.add( paylineKey );
         }
     }
 
-    // 確認每種 Symbol 都有完整的 3、4、5 連倍率
+    // 確認每種 Symbol 都有從最低連線數到最大軸數的完整倍率
     private validateSymbolMultipliers( symbolMultipliers: ISymbolMultiplier[] ): void
     {
         if ( !Array.isArray( symbolMultipliers ) || symbolMultipliers.length !== SYMBOL_TYPE_LIST.length )
@@ -148,14 +159,39 @@ export class GameConfig
                 throw new Error( `[GameConfig] 缺少 ${SymbolType[ symbolType ]} 的倍率設定。` );
             }
 
-            // 目前規則只需要確認 3、4、5 連都有合法倍率
-            for ( const matchCount of WIN_MATCH_COUNTS )
+            if ( !symbolMultiplier.Multipliers || typeof symbolMultiplier.Multipliers !== 'object' || Array.isArray( symbolMultiplier.Multipliers ) )
+            {
+                throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 的倍率設定格式不合法。` );
+            }
+
+            const matchCounts: number[] = Object.keys( symbolMultiplier.Multipliers ).map( ( matchCount: string ): number => Number( matchCount ) ).sort( ( firstCount: number, secondCount: number ): number => firstCount - secondCount );
+
+            if ( matchCounts.length === 0 )
+            {
+                throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 至少需要一組連線倍率。` );
+            }
+
+            const configuredMatchCounts: Set<number> = new Set<number>();
+
+            for ( const matchCount of matchCounts )
             {
                 const multiplier: number = symbolMultiplier.Multipliers[ matchCount ];
 
-                if ( typeof multiplier !== 'number' || multiplier < 0 )
+                if ( !Number.isInteger( matchCount ) || matchCount <= 0 || matchCount > GameUtility.GetSlotColumnCount() || !Number.isFinite( multiplier ) || multiplier < 0 )
                 {
                     throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 的 ${matchCount} 連倍率設定不合法。` );
+                }
+
+                configuredMatchCounts.add( matchCount );
+            }
+
+            const minimumMatchCount: number = matchCounts[ 0 ];
+
+            for ( let matchCount: number = minimumMatchCount; matchCount <= GameUtility.GetSlotColumnCount(); matchCount++ )
+            {
+                if ( !configuredMatchCounts.has( matchCount ) )
+                {
+                    throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 缺少 ${matchCount} 連倍率設定。` );
                 }
             }
         }

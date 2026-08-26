@@ -1,6 +1,6 @@
 import { SpinResultData } from '../GameData/SpinResultData';
 import { SYMBOL_TYPE_LIST, SymbolType } from '../GameData/SymbolType';
-import { IWinResultData } from '../GameData/WinResultData';
+import { ILineResultData } from '../GameData/LineResultData';
 import { GameUtility } from '../GameUtility/GameUtility';
 import { ScoreCalculator } from './ScoreCalculator';
 import { SpinResultChecker } from './SpinResultChecker';
@@ -14,19 +14,19 @@ export interface ISpinResultProvider
 // 提供本機 Spin Result
 export class LocalSpinResultProvider implements ISpinResultProvider
 {
-    // 判斷隨機盤面中的所有中獎線
+    // 判斷隨機盤面中的所有中獎 Payline
     private _spinResultChecker: SpinResultChecker = new SpinResultChecker();
 
-    // 計算目前單注對應的總得分
+    // 計算目前單注對應的各線得分與總得分
     private _scoreCalculator: ScoreCalculator = new ScoreCalculator();
 
     public GetSpinResult( bet: number ): SpinResultData
     {
         const slotGrids: SymbolType[][] = this.generateSlotGrids();
-        const winResults: IWinResultData[] = this._spinResultChecker.CheckWinResults( slotGrids );
-        const totalScore: number = this._scoreCalculator.CalculateTotalScore( bet, winResults );
+        const lineResults: ILineResultData[] = this._spinResultChecker.CheckLineResults( slotGrids );
+        const totalScore: number = this._scoreCalculator.CalculateTotalScore( bet, lineResults );
 
-        return new SpinResultData( slotGrids, winResults, totalScore );
+        return new SpinResultData( slotGrids, lineResults, totalScore );
     }
 
     // 隨機產生單局盤面結果

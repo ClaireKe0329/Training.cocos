@@ -1,4 +1,5 @@
 import { _decorator, Component } from 'cc';
+import { ILineResultData } from '../GameData/LineResultData';
 import { SpinResultData } from '../GameData/SpinResultData';
 import { SymbolType } from '../GameData/SymbolType';
 import { ReelController } from '../Reel/ReelController';
@@ -93,6 +94,14 @@ export class SlotProcessor extends Component
             return;
         }
 
+        const lineScores = spinResult.LineResults.map( ( lineResult: ILineResultData ) => ( {
+            PaylineNumber: lineResult.PaylineIndex + 1,
+            Symbol: SymbolType[ lineResult.SymbolType ],
+            MatchCount: lineResult.MatchCount,
+            Score: lineResult.Score,
+        } ) );
+
+        console.log( '[SlotProcessor] 各中獎 Payline 得分', lineScores );
         console.log( '[SlotProcessor] 本局得分', spinResult.TotalScore );
     }
 }

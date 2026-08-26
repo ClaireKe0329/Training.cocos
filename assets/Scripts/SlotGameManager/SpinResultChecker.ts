@@ -1,33 +1,42 @@
 import { SymbolType } from '../GameData/SymbolType';
-import { IWinResultData } from '../GameData/WinResultData';
+import { ILineResultData } from '../GameData/LineResultData';
+import { ISymbolMultiplier } from '../GameData/SymbolMultiplier';
 import { GameConfig } from '../GameUtility/GameConfig';
-import { MIN_WIN_MATCH_COUNT, WinMatchCount } from '../GameData/WinRule';
 
-// 依照設定的 Payline 判斷盤面中所有中獎結果
+// 依照設定的 Payline 判斷盤面中所有中獎線
 export class SpinResultChecker
 {
-    // 檢查每條 Payline 並回傳所有符合最低連線數的結果
-    public CheckWinResults( slotGrids: SymbolType[][] ): IWinResultData[]
+    // 每種 Symbol 的最低連線數由自身倍率設定中的最小 key 決定
+    public CheckLineResults( slotGrids: SymbolType[][] ): ILineResultData[]
     {
-        const winResults: IWinResultData[] = [];
+        const paylines: number[][] = GameConfig.GetInstance().Paylines;
+        const symbolMultipliers: ISymbolMultiplier[] = GameConfig.GetInstance().SymbolMultipliers;
+        const lineResults: ILineResultData[] = [];
 
-        for ( const payline of GameConfig.GetInstance().Paylines )
+        for ( let paylineIndex: number = 0; paylineIndex < paylines.length; paylineIndex++ )
         {
-            const winResult: IWinResultData | null = this.checkPayline( slotGrids, payline );
+            const lineResult: ILineResultData | null = this.checkPayline( slotGrids, paylines[ paylineIndex ], paylineIndex, symbolMultipliers );
 
-            if ( winResult !== null )
+            if ( lineResult !== null )
             {
-                winResults.push( winResult );
+                lineResults.push( lineResult );
             }
         }
 
-        return winResults;
+        return lineResults;
     }
 
     // 從第一軸開始向右連續比對相同 Symbol，遇到不同 Symbol 時停止
-    private checkPayline( slotGrids: SymbolType[][], payline: number[] ): IWinResultData | null
+    private checkPayline( slotGrids: SymbolType[][], payline: number[], paylineIndex: number, symbolMultipliers: ISymbolMultiplier[] ): ILineResultData | null
     {
         const firstSymbol: SymbolType = slotGrids[ 0 ][ payline[ 0 ] ];
+        const symbolMultiplier: ISymbolMultiplier | undefined = symbolMultipliers.find( ( configuredMultiplier: ISymbolMultiplier ): boolean => configuredMultiplier.SymbolType === firstSymbol );
+
+        if ( symbolMultiplier === undefined )
+        {
+            throw new Error( `[SpinResultChecker] 找不到 ${SymbolType[ firstSymbol ]} 的倍率設定。` );
+        }
+
         let matchCount: number = 1;
         const winningPositions = [ { ReelIndex: 0, RowIndex: payline[ 0 ] } ];
 
@@ -47,17 +56,22 @@ export class SpinResultChecker
             }
         }
 
-        if ( matchCount < MIN_WIN_MATCH_COUNT )
+        const minimumMatchCount: number = Math.min( ...Object.keys( symbolMultiplier.Multipliers ).map( ( configuredMatchCount: string ): number => Number( configuredMatchCount ) ) );
+
+        if ( matchCount < minimumMatchCount )
         {
             return null;
         }
 
-        const winResult: IWinResultData = {
+        // Checker 只保存命中內容，Score 由 ScoreCalculator 接續回填
+        const lineResult: ILineResultData = {
+            PaylineIndex: paylineIndex,
             SymbolType: firstSymbol,
-            MatchCount: matchCount as WinMatchCount,
+            MatchCount: matchCount,
             WinningPositions: winningPositions,
+            Score: 0,
         };
 
-        return winResult;
+        return lineResult;
     }
 }
