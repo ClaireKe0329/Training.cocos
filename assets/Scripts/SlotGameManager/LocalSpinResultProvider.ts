@@ -1,17 +1,36 @@
 import { SpinResultData } from '../GameData/SpinResultData';
 import { SYMBOL_TYPE_LIST, SymbolType } from '../GameData/SymbolType';
+import { IWinResultData } from '../GameData/WinResultData';
 import { GameUtility } from '../GameUtility/GameUtility';
+import { ScoreCalculator } from './ScoreCalculator';
+import { SpinResultChecker } from './SpinResultChecker';
 
-// 定義單局 Spin Result 的取得方式
+// 定義單局 Spin Result 的取得方式；沒有合法結果時回傳 null
 export interface ISpinResultProvider
 {
-    GetSpinResult(): SpinResultData;
+    GetSpinResult( bet: number ): SpinResultData | null;
 }
 
 // 提供本機 Spin Result
 export class LocalSpinResultProvider implements ISpinResultProvider
 {
-    public GetSpinResult(): SpinResultData
+    // 判斷隨機盤面中的所有中獎線
+    private _spinResultChecker: SpinResultChecker = new SpinResultChecker();
+
+    // 計算目前單注對應的總得分
+    private _scoreCalculator: ScoreCalculator = new ScoreCalculator();
+
+    public GetSpinResult( bet: number ): SpinResultData
+    {
+        const slotGrids: SymbolType[][] = this.generateSlotGrids();
+        const winResults: IWinResultData[] = this._spinResultChecker.CheckWinResults( slotGrids );
+        const totalScore: number = this._scoreCalculator.CalculateTotalScore( bet, winResults );
+
+        return new SpinResultData( slotGrids, winResults, totalScore );
+    }
+
+    // 隨機產生單局盤面結果
+    private generateSlotGrids(): SymbolType[][]
     {
         const slotGrids: SymbolType[][] = [];
 
@@ -27,7 +46,7 @@ export class LocalSpinResultProvider implements ISpinResultProvider
             slotGrids.push( reelSymbols );
         }
 
-        return new SpinResultData( slotGrids );
+        return slotGrids;
     }
 
     // 隨機取得一個有效的 SymbolType
