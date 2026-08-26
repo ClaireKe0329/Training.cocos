@@ -111,8 +111,6 @@ export class GameConfig
             throw new Error( '[GameConfig] 至少需要設定一條 Payline。' );
         }
 
-        const configuredPaylineKeys: Set<string> = new Set<string>();
-
         for ( const payline of paylines )
         {
             // 一條 Payline 必須包含每一軸的 Row Index
@@ -129,69 +127,40 @@ export class GameConfig
                     throw new Error( '[GameConfig] Payline 包含無效的 Row Index。' );
                 }
             }
-
-            const paylineKey: string = payline.join( ',' );
-
-            if ( configuredPaylineKeys.has( paylineKey ) )
-            {
-                throw new Error( `[GameConfig] Payline 設定重複：${paylineKey}。` );
-            }
-
-            configuredPaylineKeys.add( paylineKey );
         }
     }
 
-    // 確認每種 Symbol 都有從最低連線數到最大軸數的完整倍率
+    // 確認每種 Symbol 都有可使用的連線倍率
     private validateSymbolMultipliers( symbolMultipliers: ISymbolMultiplier[] ): void
     {
-        if ( !Array.isArray( symbolMultipliers ) || symbolMultipliers.length !== SYMBOL_TYPE_LIST.length )
-        {
-            throw new Error( '[GameConfig] Symbol 倍率設定數量不正確。' );
-        }
-
         for ( const symbolType of SYMBOL_TYPE_LIST )
         {
             const symbolMultiplier: ISymbolMultiplier | undefined = symbolMultipliers.find( ( multiplier: ISymbolMultiplier ): boolean => multiplier.SymbolType === symbolType );
 
             // 每種 Symbol 都必須有對應的倍率設定
-            if ( symbolMultiplier === undefined )
+            if ( symbolMultiplier === undefined || !symbolMultiplier.Multipliers )
             {
                 throw new Error( `[GameConfig] 缺少 ${SymbolType[ symbolType ]} 的倍率設定。` );
             }
 
-            if ( !symbolMultiplier.Multipliers || typeof symbolMultiplier.Multipliers !== 'object' || Array.isArray( symbolMultiplier.Multipliers ) )
-            {
-                throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 的倍率設定格式不合法。` );
-            }
-
-            const matchCounts: number[] = Object.keys( symbolMultiplier.Multipliers ).map( ( matchCount: string ): number => Number( matchCount ) ).sort( ( firstCount: number, secondCount: number ): number => firstCount - secondCount );
+            // 最小倍率 Key 代表此 Symbol 的最低中獎連線數
+            const matchCounts: number[] = Object.keys( symbolMultiplier.Multipliers ).map( Number );
 
             if ( matchCounts.length === 0 )
             {
-                throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 至少需要一組連線倍率。` );
+                throw new Error( `[GameConfig] 缺少 ${SymbolType[ symbolType ]} 的倍率設定。` );
             }
 
-            const configuredMatchCounts: Set<number> = new Set<number>();
+            const minimumMatchCount: number = Math.min( ...matchCounts );
 
-            for ( const matchCount of matchCounts )
+            // 從最低中獎連線數到最大 Reel 數都必須有倍率
+            for ( let matchCount: number = minimumMatchCount; matchCount <= GameUtility.GetSlotColumnCount(); matchCount++ )
             {
                 const multiplier: number = symbolMultiplier.Multipliers[ matchCount ];
 
-                if ( !Number.isInteger( matchCount ) || matchCount <= 0 || matchCount > GameUtility.GetSlotColumnCount() || !Number.isFinite( multiplier ) || multiplier < 0 )
+                if ( typeof multiplier !== 'number' || multiplier < 0 )
                 {
-                    throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 的 ${matchCount} 連倍率設定不合法。` );
-                }
-
-                configuredMatchCounts.add( matchCount );
-            }
-
-            const minimumMatchCount: number = matchCounts[ 0 ];
-
-            for ( let matchCount: number = minimumMatchCount; matchCount <= GameUtility.GetSlotColumnCount(); matchCount++ )
-            {
-                if ( !configuredMatchCounts.has( matchCount ) )
-                {
-                    throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 缺少 ${matchCount} 連倍率設定。` );
+                    throw new Error( `[GameConfig] ${SymbolType[ symbolType ]} 缺少 ${matchCount} 連的有效倍率。` );
                 }
             }
         }

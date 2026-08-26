@@ -6,7 +6,7 @@ import { GameConfig } from '../GameUtility/GameConfig';
 export class ScoreCalculator
 {
     // 回填每條中獎線的 Score，並回傳累加後的 TotalScore
-    public CalculateTotalScore( bet: number, lineResults: ILineResultData[] ): number
+    public CalculateScores( bet: number, lineResults: ILineResultData[] ): number
     {
         const symbolMultipliers: ISymbolMultiplier[] = GameConfig.GetInstance().SymbolMultipliers;
         let totalScore: number = 0;

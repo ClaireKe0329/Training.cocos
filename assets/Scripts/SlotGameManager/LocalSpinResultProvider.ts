@@ -24,7 +24,7 @@ export class LocalSpinResultProvider implements ISpinResultProvider
     {
         const slotGrids: SymbolType[][] = this.generateSlotGrids();
         const lineResults: ILineResultData[] = this._spinResultChecker.CheckLineResults( slotGrids );
-        const totalScore: number = this._scoreCalculator.CalculateTotalScore( bet, lineResults );
+        const totalScore: number = this._scoreCalculator.CalculateScores( bet, lineResults );
 
         return new SpinResultData( slotGrids, lineResults, totalScore );
     }

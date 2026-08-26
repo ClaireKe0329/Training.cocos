@@ -1,7 +1,7 @@
 import { SymbolType } from './SymbolType';
 import { ILineResultData } from './LineResultData';
 
-// 保存單局 Spin 的盤面結果
+// 保存單局 Spin 的完整結果
 export class SpinResultData
 {
     public readonly SlotGrids: SymbolType[][];
