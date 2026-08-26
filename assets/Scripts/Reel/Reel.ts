@@ -77,7 +77,7 @@ export class Reel extends Component
     // 設定停輪結果並讓 Reel 進入 ReadyToStop 狀態
     public StopSpin( stopSymbols: SymbolType[] ): void
     {
-        if ( this._fsMachine.CurrentState !== ReelState.Run || stopSymbols.length !== GameUtility.GetSlotRowCount() )
+        if ( this._fsMachine.CurrentState !== ReelState.Run )
         {
             return;
         }
@@ -201,15 +201,7 @@ export class Reel extends Component
     // 將陣列尾端的 SlotUnit 取出並放置到第一個
     private moveSlotUnitToFirst(): void
     {
-
-        const recycledSlotUnit: SlotUnit | undefined = this.SlotUnits.pop();
-
-        if ( recycledSlotUnit === undefined )
-        {
-            return;
-        }
-
-        // 補回一格 SymbolHeight，維持 Reel 移動位置的連續性
+        const recycledSlotUnit: SlotUnit = this.SlotUnits.pop()!;
         this._reelVerticalOffset += this.SymbolHeight;
         this.SlotUnits.unshift( recycledSlotUnit );
     }

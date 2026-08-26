@@ -55,15 +55,7 @@ export class SlotProcessor extends Component
             return true;
         }
 
-        const isSpinResultAccepted: boolean = this.ReelController.SetSpinResult( spinResult.SlotGrids );
-
-        // 結果未被接受時不保存本局結果，Reel 維持運轉
-        if ( !isSpinResultAccepted )
-        {
-            console.warn( '[SlotProcessor] Spin Result 未被 ReelController 接受，Reel 將繼續運轉。' );
-            return true;
-        }
-
+        this.ReelController.SetSpinResult( spinResult.SlotGrids );
         this._spinResult = spinResult;
 
         console.log( '[SlotProcessor] 取得盤面結果', this._spinResult.SlotGrids.map( ( reelSymbols: SymbolType[] ) => reelSymbols.map( ( symbol: SymbolType ) => SymbolType[ symbol ] ) ) );
@@ -74,12 +66,12 @@ export class SlotProcessor extends Component
     // 將目前 Round 的 Skip 操作交給 ReelController 判斷
     public SkipRound(): boolean
     {
-        if ( !this.CanSkipRound || !this.ReelController )
+        if ( !this.CanSkipRound )
         {
             return false;
         }
 
-        return this.ReelController.SkipSpin();
+        return this.ReelController!.SkipSpin();
     }
 
     // Reel 全部停止後處理目前 Round 的結果

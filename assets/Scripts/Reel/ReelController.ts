@@ -105,17 +105,10 @@ export class ReelController extends Component
         return true;
     }
 
-    // 保存有效停輪結果
-    public SetSpinResult( reelResults: SymbolType[][] ): boolean
+    // 保存停輪結果
+    public SetSpinResult( reelResults: SymbolType[][] ): void
     {
-        // 尚未 Spin、已開始停輪或結果格式錯誤時不保存結果
-        if ( !this._isSpinRunning || this._isStopping || !this.isValidReelResults( reelResults ) )
-        {
-            return false;
-        }
-
         this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
-        return true;
     }
 
     // 有效結果存在時切換為快速停輪
@@ -134,8 +127,7 @@ export class ReelController extends Component
     // 自動停輪時等待最低 Spin 時間，快速停輪則直接開始停輪
     private tryStopSpin(): void
     {
-        // 尚未 Spin、已開始停輪或沒有有效結果時不啟動停輪
-        if ( !this._isSpinRunning || this._isStopping || this._reelResults === null )
+        if ( this._reelResults === null )
         {
             return;
         }
@@ -168,17 +160,6 @@ export class ReelController extends Component
 
         // 所有 Reel 都已收到 StopSpin Command
         this._hasPendingReelStop = false;
-    }
-
-    // 檢查停輪結果是否符合 Reel 數量與每軸 Symbol 數量
-    private isValidReelResults( reelResults: SymbolType[][] ): boolean
-    {
-        if ( reelResults.length !== GameUtility.GetSlotColumnCount() )
-        {
-            return false;
-        }
-
-        return reelResults.every( ( stopSymbols: SymbolType[] ): boolean => stopSymbols.length === GameUtility.GetSlotRowCount() );
     }
 
     // 重設狀態後通知上層 Reel Spin 已完整結束

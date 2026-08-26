@@ -30,13 +30,7 @@ export class SpinResultChecker
     private checkPayline( slotGrids: SymbolType[][], payline: number[], paylineIndex: number, symbolMultipliers: ISymbolMultiplier[] ): ILineResultData | null
     {
         const firstSymbol: SymbolType = slotGrids[ 0 ][ payline[ 0 ] ];
-        const symbolMultiplier: ISymbolMultiplier | undefined = symbolMultipliers.find( ( configuredMultiplier: ISymbolMultiplier ): boolean => configuredMultiplier.SymbolType === firstSymbol );
-
-        if ( symbolMultiplier === undefined )
-        {
-            throw new Error( `[SpinResultChecker] 找不到 ${SymbolType[ firstSymbol ]} 的倍率設定。` );
-        }
-
+        const symbolMultiplier: ISymbolMultiplier = symbolMultipliers.find( ( configuredMultiplier: ISymbolMultiplier ): boolean => configuredMultiplier.SymbolType === firstSymbol )!;
         let matchCount: number = 1;
         const winningPositions = [ { ReelIndex: 0, RowIndex: payline[ 0 ] } ];
 

@@ -13,20 +13,8 @@ export class ScoreCalculator
 
         for ( const lineResult of lineResults )
         {
-            const symbolMultiplier: ISymbolMultiplier | undefined = symbolMultipliers.find( ( configuredMultiplier: ISymbolMultiplier ): boolean => configuredMultiplier.SymbolType === lineResult.SymbolType );
-
-            if ( symbolMultiplier === undefined )
-            {
-                throw new Error( `[ScoreCalculator] 找不到 ${lineResult.SymbolType} 的倍率設定。` );
-            }
-
+            const symbolMultiplier: ISymbolMultiplier = symbolMultipliers.find( ( configuredMultiplier: ISymbolMultiplier ): boolean => configuredMultiplier.SymbolType === lineResult.SymbolType )!;
             const multiplier: number = symbolMultiplier.Multipliers[ lineResult.MatchCount ];
-
-            if ( typeof multiplier !== 'number' )
-            {
-                throw new Error( `[ScoreCalculator] 找不到 ${lineResult.SymbolType} 的 ${lineResult.MatchCount} 連倍率。` );
-            }
-
             lineResult.Score = bet * multiplier;
             totalScore += lineResult.Score;
         }
