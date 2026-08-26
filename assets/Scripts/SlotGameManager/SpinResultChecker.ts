@@ -30,7 +30,9 @@ export class SpinResultChecker
     private checkPayline( slotGrids: SymbolType[][], payline: number[], paylineIndex: number, symbolMultipliers: ISymbolMultiplier[] ): ILineResultData | null
     {
         const firstSymbol: SymbolType = slotGrids[ 0 ][ payline[ 0 ] ];
-        const symbolMultiplier: ISymbolMultiplier = symbolMultipliers.find( ( configuredMultiplier: ISymbolMultiplier ): boolean => configuredMultiplier.SymbolType === firstSymbol )!;
+        const symbolMultiplier: ISymbolMultiplier = symbolMultipliers.find(
+            ( configuredMultiplier: ISymbolMultiplier ): boolean =>
+                configuredMultiplier.SymbolType === firstSymbol )!;
         let matchCount: number = 1;
         const winningPositions = [ { ReelIndex: 0, RowIndex: payline[ 0 ] } ];
 
@@ -51,7 +53,9 @@ export class SpinResultChecker
         }
 
         // 以倍率設定中的最小連線數作為此 Symbol 的中獎門檻
-        const minimumMatchCount: number = Math.min( ...Object.keys( symbolMultiplier.Multipliers ).map( ( configuredMatchCount: string ): number => Number( configuredMatchCount ) ) );
+        const minimumMatchCount: number = Math.min(
+            ...Object.keys( symbolMultiplier.Multipliers ).map(
+                ( configuredMatchCount: string ): number => Number( configuredMatchCount ) ) );
 
         if ( matchCount < minimumMatchCount )
         {
