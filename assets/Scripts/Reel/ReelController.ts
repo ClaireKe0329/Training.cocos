@@ -3,6 +3,7 @@ import { SymbolType } from '../GameData/SymbolType';
 import { GameConfig } from '../GameUtility/GameConfig';
 import { GameUtility } from '../GameUtility/GameUtility';
 import { Reel } from './Reel';
+import { SlotUnit } from './SlotUnit';
 
 const { ccclass, property } = _decorator;
 
@@ -38,6 +39,12 @@ export class ReelController extends Component
     public get CanSkipSpin(): boolean
     {
         return this._isSpinRunning && this._hasPendingReelStop && !this._isSkipRequested;
+    }
+
+    // 目前 Controller 與 Reel 數量是否允許開始新的 Spin
+    public get CanStartSpin(): boolean
+    {
+        return !this._isSpinRunning && this.Reels.length === GameUtility.GetSlotColumnCount();
     }
 
     // 依目前階段處理 Spin 計時或等待所有 Reel 運轉完成，最後重設狀態
@@ -84,7 +91,7 @@ export class ReelController extends Component
     // 啟動所有 Reel 進行 Spin
     public StartSpin( onSpinComplete: () => void ): boolean
     {
-        if ( this._isSpinRunning || this.Reels.length !== GameUtility.GetSlotColumnCount() )
+        if ( !this.CanStartSpin )
         {
             return false;
         }
@@ -109,6 +116,17 @@ export class ReelController extends Component
     public SetSpinResult( reelResults: SymbolType[][] ): void
     {
         this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
+    }
+
+    // 取得目前可視區域指定座標的 SlotUnit
+    public GetVisibleSlotUnit( reelIndex: number, rowIndex: number ): SlotUnit | null
+    {
+        if ( reelIndex < 0 || reelIndex >= this.Reels.length )
+        {
+            return null;
+        }
+
+        return this.Reels[ reelIndex ].GetVisibleSlotUnitByRow( rowIndex );
     }
 
     // 有效結果存在時切換為快速停輪

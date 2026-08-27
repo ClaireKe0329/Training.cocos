@@ -104,6 +104,18 @@ export class Reel extends Component
         this.fixingPosition();
     }
 
+    // 取得目前可視區域指定 Row 的 SlotUnit
+    public GetVisibleSlotUnitByRow( rowIndex: number ): SlotUnit | null
+    {
+        if ( rowIndex < 0 || rowIndex >= GameUtility.GetSlotRowCount() )
+        {
+            return null;
+        }
+
+        const visibleIndex: number = rowIndex + 1;
+        return this.SlotUnits[ visibleIndex ] ?? null;
+    }
+
     // 初始化狀態機
     private initFSM(): void
     {

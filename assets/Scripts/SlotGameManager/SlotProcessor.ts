@@ -3,11 +3,9 @@ import { ILineResultData } from '../GameData/LineResultData';
 import { SpinResultData } from '../GameData/SpinResultData';
 import { SymbolType } from '../GameData/SymbolType';
 import { ReelController } from '../Reel/ReelController';
+import { RewardShowProcessor } from '../RewardShow/RewardShowProcessor';
 import { ISpinResultProvider, LocalSpinResultProvider } from './LocalSpinResultProvider';
 const { ccclass, property } = _decorator;
-
-// 尚未建立下注系統前使用的固定單注
-const FIXED_BET: number = 100;
 
 @ccclass( 'SlotProcessor' )
 export class SlotProcessor extends Component
@@ -15,6 +13,10 @@ export class SlotProcessor extends Component
     // 負責多軸 Spin 與 Stop 流程的 ReelController
     @property( { type: ReelController } )
     public ReelController: ReelController | null = null;
+
+    // Reel 完成後負責播放本局中獎表現
+    @property( { type: RewardShowProcessor } )
+    public RewardShowProcessor: RewardShowProcessor | null = null;
 
     // 提供目前單局使用的 Spin Result
     private _spinResultProvider: ISpinResultProvider = new LocalSpinResultProvider();
@@ -25,10 +27,18 @@ export class SlotProcessor extends Component
     // 目前是否正在處理單一 Round
     private _isRoundRunning: boolean = false;
 
+    // Reward 與 Settlement 完成後通知 SlotGameManager
+    private _onRoundComplete: ( ( spinResult: SpinResultData | null ) => void ) | null = null;
+
     // 取得目前 Round 是否正在執行
     public get IsRoundRunning(): boolean
     {
         return this._isRoundRunning;
+    }
+
+    protected onLoad(): void
+    {
+        this.tryResolveDependencies();
     }
 
     // 目前 Round 是否可以要求 Skip
@@ -37,17 +47,27 @@ export class SlotProcessor extends Component
         return this._isRoundRunning && ( this.ReelController?.CanSkipSpin ?? false );
     }
 
-    // 啟動單一 Round，取得完整結果並交給 ReelController
-    public StartRound(): boolean
+    // Dependency 與 lifecycle 都允許時才可開始新 Round
+    public get CanStartRound(): boolean
     {
-        if ( this._isRoundRunning || !this.ReelController || !this.ReelController.StartSpin( this.completeRound.bind( this ) ) )
+        this.tryResolveDependencies();
+        return !this._isRoundRunning && this.ReelController !== null && this.RewardShowProcessor !== null && this.ReelController.CanStartSpin && !this.RewardShowProcessor.IsShowingReward;
+    }
+
+    // 啟動單一 Round，取得完整結果並交給 ReelController
+    public StartRound( bet: number, onRoundComplete: ( spinResult: SpinResultData | null ) => void ): boolean
+    {
+        this.tryResolveDependencies();
+
+        if ( !this.CanStartRound || !this.ReelController!.StartSpin( this.onReelComplete.bind( this ) ) )
         {
             return false;
         }
 
         this._isRoundRunning = true;
+        this._onRoundComplete = onRoundComplete;
 
-        const spinResult: SpinResultData | null = this._spinResultProvider.GetSpinResult( FIXED_BET );
+        const spinResult: SpinResultData | null = this._spinResultProvider.GetSpinResult( bet );
 
         // 沒有可用結果時不設定停輪結果，Reel 維持運轉
         if ( spinResult === null )
@@ -74,15 +94,37 @@ export class SlotProcessor extends Component
         return this.ReelController!.SkipSpin();
     }
 
-    // Reel 全部停止後處理目前 Round 的結果
+    // Reel 全部停止後使用同一份 Result 進入 Reward Flow
+    private onReelComplete(): void
+    {
+        if ( !this._isRoundRunning )
+        {
+            return;
+        }
+
+        if ( this._spinResult === null || !this.RewardShowProcessor || !this.ReelController || !this.RewardShowProcessor.ShowReward( this._spinResult, this.ReelController, this.completeRound.bind( this ) ) )
+        {
+            this.completeRound();
+        }
+    }
+
+    // Reward 完成後結束目前 Round 並通知 SlotGameManager Settlement
     private completeRound(): void
     {
+        if ( !this._isRoundRunning )
+        {
+            return;
+        }
+
         const spinResult: SpinResultData | null = this._spinResult;
+        const onRoundComplete: ( ( spinResult: SpinResultData | null ) => void ) | null = this._onRoundComplete;
         this._spinResult = null;
         this._isRoundRunning = false;
+        this._onRoundComplete = null;
 
         if ( spinResult === null )
         {
+            onRoundComplete?.( null );
             return;
         }
 
@@ -95,5 +137,27 @@ export class SlotProcessor extends Component
 
         console.log( '[SlotProcessor] 各中獎 Payline 得分', lineScores );
         console.log( '[SlotProcessor] 本局得分', spinResult.TotalScore );
+        onRoundComplete?.( spinResult );
+    }
+
+    // 當 Inspector 尚未綁定時，嘗試從場景中解析必要依賴
+    private tryResolveDependencies(): void
+    {
+        const sceneNode = this.node.scene;
+
+        if ( sceneNode === null )
+        {
+            return;
+        }
+
+        if ( this.ReelController === null )
+        {
+            this.ReelController = sceneNode.getComponentInChildren( ReelController );
+        }
+
+        if ( this.RewardShowProcessor === null )
+        {
+            this.RewardShowProcessor = sceneNode.getComponentInChildren( RewardShowProcessor );
+        }
     }
 }
