@@ -1,7 +1,13 @@
+// 定義每個 State 可提供的生命週期事件
 export interface IStateEvent
 {
+    // 進入 State 時執行一次
     OnEnter?(): void;
+
+    // State 持續期間每幀執行
     OnUpdate( deltaTime: number ): void;
+
+    // 離開 State 時執行一次
     OnExit?(): void;
 }
 
@@ -10,10 +16,13 @@ export interface IStateEvent
  */
 export class FSMachine<TState>
 {
+    // 保存每個 State 對應的生命週期事件
     private _stateEventMap: Map<TState, IStateEvent> = new Map<TState, IStateEvent>();
 
+    // 目前所在的 State
     private _currentState: TState;
 
+    // FSM 是否已正式啟動
     private _isStarted: boolean = false;
 
     constructor( initState: TState )

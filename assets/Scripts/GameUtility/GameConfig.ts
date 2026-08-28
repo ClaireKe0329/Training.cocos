@@ -3,29 +3,55 @@ import { GameUtility } from './GameUtility';
 import { SYMBOL_TYPE_LIST, SymbolType } from '../GameData/SymbolType';
 import { ISymbolMultiplier } from '../GameData/SymbolMultiplier';
 
+// 定義 config.json 載入後必須提供的遊戲設定
 export interface IGameConfig
 {
+    // Reel 每秒移動速度
     readonly SpinSpeed: number;
+
+    // Reel 停止時 Shock 的最大位移距離
     readonly ShockDistance: number;
+
+    // Reel Shock 動畫持續時間
     readonly ShockDuration: number;
+
+    // 各 Reel 依序收到 Stop Command 的時間間隔
     readonly ReelStopInterval: number;
+
+    // 自動停輪前最少需要運轉的時間
     readonly SpinDuration: number;
+
+    // 遊戲啟動時的初始 Balance
     readonly InitialBalance: number;
+
+    // 遊戲啟動時的初始 Bet
     readonly InitialBet: number;
+
+    // Win 表現播放後等待 Round 繼續的時間
     readonly RewardShowDuration: number;
+
+    // 所有 Payline，每個值代表該 Reel 對應的 Row Index
     readonly Paylines: number[][];
+
+    // 每種 Symbol 在不同連線數量下的得分倍率
     readonly SymbolMultipliers: ISymbolMultiplier[];
 }
 
+// 集中載入、驗證並提供整台 Slot 共用的遊戲設定
 export class GameConfig
 {
+    // 全專案共用的 GameConfig Instance
     private static _instance: GameConfig | null = null;
+
+    // 已通過驗證、可供下游使用的設定
     private _config: IGameConfig | null = null;
 
+    // GameConfig 只允許透過 GetInstance() 取得
     private constructor()
     {
     }
 
+    // 取得全專案共用的 GameConfig
     public static GetInstance(): GameConfig
     {
         if ( GameConfig._instance === null )

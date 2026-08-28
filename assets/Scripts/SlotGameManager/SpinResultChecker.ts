@@ -30,6 +30,8 @@ export class SpinResultChecker
     private checkPayline( slotGrids: SymbolType[][], payline: number[], paylineIndex: number, symbolMultipliers: ISymbolMultiplier[] ): ILineResultData | null
     {
         const firstSymbol: SymbolType = slotGrids[ 0 ][ payline[ 0 ] ];
+
+        // GameConfig 已保證每種 Symbol 都有倍率設定，Checker 直接依此 Contract 使用
         const symbolMultiplier: ISymbolMultiplier = symbolMultipliers.find(
             ( configuredMultiplier: ISymbolMultiplier ): boolean =>
                 configuredMultiplier.SymbolType === firstSymbol )!;

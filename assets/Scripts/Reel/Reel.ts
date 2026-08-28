@@ -14,19 +14,31 @@ const VISIBLE_START_INDEX: number = Math.floor( GameUtility.GetReelBufferUnitCou
 
 enum ReelState
 {
+    // Reel 靜止並可開始下一次 Spin
     Idle,
+
+    // Reel 持續循環並顯示亂數 Symbol
     Run,
+
+    // 已收到停輪結果，滾動期間逐步將最終 Symbol 放入 Reel
     ReadyToStop,
+
+    // 最終 Symbol 已放入完成，繼續移動到正式停輪位置
     Stop,
+
+    // 停輪後播放短暫回彈，完成後回到 Idle
     Shock,
 }
 
+// 負責單一 Reel 的循環滾動、停輪結果放入、最終定位與 Shock 狀態流程
 @ccclass( 'Reel' )
 export class Reel extends Component
 {
+    // 組成目前 Reel 的所有 SlotUnit，包含上下 Buffer
     @property( { type: [ SlotUnit ] } )
     public SlotUnits: SlotUnit[] = [];
 
+    // 相鄰 SlotUnit 之間的垂直間距
     @property( { type: CCFloat, min: 1 } )
     public SymbolHeight: number = 150;
 
@@ -45,21 +57,25 @@ export class Reel extends Component
     // 管理 Reel 目前的狀態
     private _fsMachine: FSMachine<ReelState> = new FSMachine( ReelState.Idle );
 
+    // Reel 尚未回到 Idle 時視為仍在運轉
     public get IsRunning(): boolean
     {
         return this._fsMachine.CurrentState !== ReelState.Idle;
     }
 
+    // Component 載入時建立 Reel FSM
     protected onLoad(): void
     {
         this.initFSM();
     }
 
+    // 所有 Component onLoad 完成後初始化 Reel 顯示
     protected start(): void
     {
         this.ResetReel();
     }
 
+    // 每幀交由 FSM 執行目前 State 的 Update
     protected update( deltaTime: number ): void
     {
         this._fsMachine.Tick( deltaTime );
@@ -205,14 +221,14 @@ export class Reel extends Component
         this.fixingPosition();
     }
 
-    // 更新 Reel 垂直位移並回傳是否已走完目前格距
+    // 更新 Reel 垂直位移，並回傳是否已跨過一格 Symbol 距離需要進行 SlotUnit Recycle
     private moveReel( deltaTime: number ): boolean
     {
         this._reelVerticalOffset -= GameConfig.GetInstance().SpinSpeed * deltaTime;
         return this._reelVerticalOffset <= 0;
     }
 
-    // 將陣列尾端的 SlotUnit 取出並放置到第一個
+    // 回收移出下方的 SlotUnit 到 Reel 上方，並補回一格位移維持畫面連續
     private moveSlotUnitToFirst(): void
     {
         const recycledSlotUnit: SlotUnit = this.SlotUnits.pop()!;
@@ -224,6 +240,8 @@ export class Reel extends Component
     private setNextStopSymbol(): void
     {
         const firstUnit: SlotUnit = this.SlotUnits[ 0 ];
+
+        // SlotUnit 從 Reel 上方依序被回收進來，因此停輪結果需由最下方 Row 反向放入
         const stopSymbolIndex: number = this._stopSymbols.length - this._stopSymbolCount - 1;
         firstUnit.SetSymbol( this._stopSymbols[ stopSymbolIndex ] );
         this._stopSymbolCount++;

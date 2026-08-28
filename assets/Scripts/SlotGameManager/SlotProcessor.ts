@@ -7,6 +7,7 @@ import { RewardShowProcessor } from '../RewardShow/RewardShowProcessor';
 import { ISpinResultProvider, LocalSpinResultProvider } from './LocalSpinResultProvider';
 const { ccclass, property } = _decorator;
 
+// 負責單一 Round 流程、保存本局 Result，並串接 Reel 與 Reward 的完成時機
 @ccclass( 'SlotProcessor' )
 export class SlotProcessor extends Component
 {
@@ -51,6 +52,7 @@ export class SlotProcessor extends Component
     // 啟動單一 Round，取得完整結果並交給 ReelController
     public StartRound( bet: number, onRoundComplete: ( spinResult: SpinResultData | null ) => void ): boolean
     {
+        // 先讓 Reel 進入 Run；Spin Result 只決定最終停輪內容，不負責啟動 Reel
         if ( !this.CanStartRound || !this.ReelController!.StartSpin( this.onReelComplete.bind( this ) ) )
         {
             return false;
@@ -67,6 +69,7 @@ export class SlotProcessor extends Component
             return true;
         }
 
+        // Reel 只取得最終盤面；完整 SpinResultData 留在 SlotProcessor 直到 Round 完成
         this.ReelController.SetSpinResult( spinResult.SlotGrids );
         this._spinResult = spinResult;
 
@@ -108,6 +111,8 @@ export class SlotProcessor extends Component
 
         const spinResult: SpinResultData | null = this._spinResult;
         const onRoundComplete: ( ( spinResult: SpinResultData | null ) => void ) | null = this._onRoundComplete;
+
+        // 先清除本局狀態再通知上層，確保 Round Complete Callback 只對應已結束的 Round
         this._spinResult = null;
         this._isRoundRunning = false;
         this._onRoundComplete = null;

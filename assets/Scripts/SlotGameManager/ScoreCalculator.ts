@@ -13,6 +13,7 @@ export class ScoreCalculator
 
         for ( const lineResult of lineResults )
         {
+            // Symbol 倍率完整性已由 GameConfig 保證，LineResult 的 MatchCount 則由 Checker 產生
             const symbolMultiplier: ISymbolMultiplier = symbolMultipliers.find( ( configuredMultiplier: ISymbolMultiplier ): boolean => configuredMultiplier.SymbolType === lineResult.SymbolType )!;
             const multiplier: number = symbolMultiplier.Multipliers[ lineResult.MatchCount ];
             lineResult.Score = bet * multiplier;

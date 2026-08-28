@@ -1,3 +1,4 @@
+// 提供 Slot 盤面與 Reel 結構共用的固定數值
 export class GameUtility
 {
     // Slot 盤面的 Reel 數量

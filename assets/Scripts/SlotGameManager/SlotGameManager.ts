@@ -5,6 +5,7 @@ import { SlotProcessor } from './SlotProcessor';
 
 const { ccclass, property } = _decorator;
 
+// 提供整台 Slot 的公開操作入口，並管理 Balance、Bet、Win 與 Round 結算
 @ccclass( 'SlotGameManager' )
 export class SlotGameManager extends Component
 {
@@ -21,6 +22,7 @@ export class SlotGameManager extends Component
     // 最近完成一局的 Win
     private _win: number = 0;
 
+    // MainScene.onLoad 已完成 GameConfig 載入後，再初始化 Runtime Game Data
     protected start(): void
     {
         const gameConfig: GameConfig = GameConfig.GetInstance();
@@ -28,16 +30,19 @@ export class SlotGameManager extends Component
         this._bet = gameConfig.InitialBet;
     }
 
+    // 提供目前 Balance 給 UI 顯示
     public get Balance(): number
     {
         return this._balance;
     }
 
+    // 提供目前 Bet 給 UI 顯示
     public get Bet(): number
     {
         return this._bet;
     }
 
+    // 提供最近完成一局的 Win 給 UI 顯示
     public get Win(): number
     {
         return this._win;
@@ -63,11 +68,13 @@ export class SlotGameManager extends Component
             return false;
         }
 
+        // Round 開始時先固定本局 Bet、清除上一局 Win，並扣除下注金額
         const roundBet: number = this._bet;
         const previousWin: number = this._win;
         this._win = 0;
         this._balance -= roundBet;
 
+        // Round 未成功啟動時還原已扣除的 Bet 與上一局 Win
         if ( !this.SlotProcessor.StartRound( roundBet, this.completeRound.bind( this ) ) )
         {
             this._balance += roundBet;

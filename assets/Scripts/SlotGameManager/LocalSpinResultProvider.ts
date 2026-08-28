@@ -11,7 +11,7 @@ export interface ISpinResultProvider
     GetSpinResult( bet: number ): SpinResultData | null;
 }
 
-// 提供本機 Spin Result
+// 本機產生盤面，交由 Checker 判斷連線、Calculator 計分後組成 SpinResultData
 export class LocalSpinResultProvider implements ISpinResultProvider
 {
     // 判斷隨機盤面中的所有中獎 Payline
@@ -20,6 +20,7 @@ export class LocalSpinResultProvider implements ISpinResultProvider
     // 計算目前單注對應的各線得分與總得分
     private _scoreCalculator: ScoreCalculator = new ScoreCalculator();
 
+    // 產生一局完整的本機 Spin Result
     public GetSpinResult( bet: number ): SpinResultData
     {
         const slotGrids: SymbolType[][] = this.generateSlotGrids();

@@ -3,8 +3,10 @@ import { SymbolType } from '../GameData/SymbolType';
 
 const { ccclass, property } = _decorator;
 
+// 目前 Symbol Win Spine 共用的播放動畫名稱
 const WIN_TRIGGER_ANIMATION: string = 'Trig';
 
+// 負責單一 Symbol 的圖示顯示與自身 Win 表現，不判斷是否中獎
 @ccclass( 'SlotUnit' )
 export class SlotUnit extends Component
 {
@@ -28,15 +30,19 @@ export class SlotUnit extends Component
     @property( { type: sp.SkeletonData } )
     public SymbolAJQKSpine: sp.SkeletonData | null = null;
 
+    // M1 使用的 Win Spine
     @property( { type: sp.SkeletonData } )
     public SymbolM1Spine: sp.SkeletonData | null = null;
 
+    // M2 使用的 Win Spine
     @property( { type: sp.SkeletonData } )
     public SymbolM2Spine: sp.SkeletonData | null = null;
 
+    // M3 使用的 Win Spine
     @property( { type: sp.SkeletonData } )
     public SymbolM3Spine: sp.SkeletonData | null = null;
 
+    // M4 使用的 Win Spine
     @property( { type: sp.SkeletonData } )
     public SymbolM4Spine: sp.SkeletonData | null = null;
 

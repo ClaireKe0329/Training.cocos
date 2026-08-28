@@ -10,6 +10,7 @@ export class MainScene extends Component
     @property( { type: JsonAsset } )
     public ConfigJson: JsonAsset | null = null;
 
+    // 在其他 Component 的 start() 前先建立 GameConfig，讓後續初始化可以直接使用合法設定
     protected onLoad(): void
     {
         if ( this.ConfigJson === null )

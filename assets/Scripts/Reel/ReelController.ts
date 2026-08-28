@@ -6,6 +6,7 @@ import { Reel } from './Reel';
 
 const { ccclass, property } = _decorator;
 
+// 負責多軸 Reel 的 Start、Stop Sequence、Stop Interval、Skip 與全部完成通知
 @ccclass( 'ReelController' )
 export class ReelController extends Component
 {
@@ -111,7 +112,7 @@ export class ReelController extends Component
         return true;
     }
 
-    // 保存停輪結果
+    // 保存本局最終盤面，等待最低 Spin 時間或 Skip 條件成立後開始停輪
     public SetSpinResult( reelResults: SymbolType[][] ): void
     {
         this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );

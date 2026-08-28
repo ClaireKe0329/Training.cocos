@@ -2,6 +2,7 @@ import { _decorator, Button, Component, Label } from 'cc';
 import { SlotGameManager } from '../SlotGameManager/SlotGameManager';
 const { ccclass, property } = _decorator;
 
+// 負責玩家操作與 UI 顯示，只讀取公開 Game Data，不決定遊戲結果與流程
 @ccclass( 'GameUIController' )
 export class GameUIController extends Component
 {
