@@ -4,6 +4,9 @@
     "ShockDuration": 0.12,
     "ReelStopInterval": 0.15,
     "SpinDuration": 2,
+    "InitialBalance": 10000,
+    "InitialBet": 100,
+    "RewardShowDuration": 1,
     "Paylines": [
         [
             1,

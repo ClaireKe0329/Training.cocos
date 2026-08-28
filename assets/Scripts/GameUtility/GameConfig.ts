@@ -10,6 +10,9 @@ export interface IGameConfig
     readonly ShockDuration: number;
     readonly ReelStopInterval: number;
     readonly SpinDuration: number;
+    readonly InitialBalance: number;
+    readonly InitialBet: number;
+    readonly RewardShowDuration: number;
     readonly Paylines: number[][];
     readonly SymbolMultipliers: ISymbolMultiplier[];
 }
@@ -49,6 +52,16 @@ export class GameConfig
             throw new Error( '[GameConfig] Reel 的速度、距離或時間設定不合法。' );
         }
 
+        // 檢查遊戲初始資料與 Reward 顯示時間
+        if (
+            typeof config.InitialBalance !== 'number' || config.InitialBalance < 0 ||
+            typeof config.InitialBet !== 'number' || config.InitialBet <= 0 ||
+            typeof config.RewardShowDuration !== 'number' || config.RewardShowDuration < 0
+        )
+        {
+            throw new Error( '[GameConfig] Balance、Bet 或 Reward 顯示時間設定不合法。' );
+        }
+
         this.validatePaylines( config.Paylines );
         this.validateSymbolMultipliers( config.SymbolMultipliers );
 
@@ -78,6 +91,21 @@ export class GameConfig
     public get SpinDuration(): number
     {
         return this.getConfig().SpinDuration;
+    }
+
+    public get InitialBalance(): number
+    {
+        return this.getConfig().InitialBalance;
+    }
+
+    public get InitialBet(): number
+    {
+        return this.getConfig().InitialBet;
+    }
+
+    public get RewardShowDuration(): number
+    {
+        return this.getConfig().RewardShowDuration;
     }
 
     // 回傳副本，避免外部直接修改 Config 內的 Payline

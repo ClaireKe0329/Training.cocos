@@ -120,11 +120,6 @@ export class ReelController extends Component
     // 要求指定 Reel 與 Row 播放 Win
     public PlayWin( reelIndex: number, rowIndex: number ): void
     {
-        if ( reelIndex < 0 || reelIndex >= this.Reels.length )
-        {
-            return;
-        }
-
         this.Reels[ reelIndex ].PlayWin( rowIndex );
     }
 

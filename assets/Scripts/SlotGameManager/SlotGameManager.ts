@@ -1,5 +1,6 @@
-import { _decorator, CCInteger, Component } from 'cc';
+import { _decorator, Component } from 'cc';
 import { SpinResultData } from '../GameData/SpinResultData';
+import { GameConfig } from '../GameUtility/GameConfig';
 import { SlotProcessor } from './SlotProcessor';
 
 const { ccclass, property } = _decorator;
@@ -7,14 +8,6 @@ const { ccclass, property } = _decorator;
 @ccclass( 'SlotGameManager' )
 export class SlotGameManager extends Component
 {
-    // 遊戲開始時提供給玩家的 Balance
-    @property( { type: CCInteger, min: 0 } )
-    public InitialBalance: number = 1000;
-
-    // 目前每局使用的 Bet
-    @property( { type: CCInteger, min: 1 } )
-    public InitialBet: number = 100;
-
     // 負責單一 Round 流程的 SlotProcessor
     @property( { type: SlotProcessor } )
     public SlotProcessor: SlotProcessor | null = null;
@@ -28,13 +21,11 @@ export class SlotGameManager extends Component
     // 最近完成一局的 Win
     private _win: number = 0;
 
-    // 已扣除 Bet 並等待本局 Settlement
-    private _isSettlementPending: boolean = false;
-
-    protected onLoad(): void
+    protected start(): void
     {
-        this._balance = this.InitialBalance;
-        this._bet = this.InitialBet;
+        const gameConfig: GameConfig = GameConfig.GetInstance();
+        this._balance = gameConfig.InitialBalance;
+        this._bet = gameConfig.InitialBet;
     }
 
     public get Balance(): number
@@ -67,7 +58,7 @@ export class SlotGameManager extends Component
     // 啟動單一 Round
     public StartRound(): boolean
     {
-        if ( !this.SlotProcessor || !this.SlotProcessor.CanStartRound || this._isSettlementPending || this._balance < this._bet )
+        if ( !this.SlotProcessor || !this.SlotProcessor.CanStartRound || this._balance < this._bet )
         {
             return false;
         }
@@ -76,13 +67,11 @@ export class SlotGameManager extends Component
         const previousWin: number = this._win;
         this._win = 0;
         this._balance -= roundBet;
-        this._isSettlementPending = true;
 
         if ( !this.SlotProcessor.StartRound( roundBet, this.completeRound.bind( this ) ) )
         {
             this._balance += roundBet;
             this._win = previousWin;
-            this._isSettlementPending = false;
             return false;
         }
 
@@ -100,16 +89,9 @@ export class SlotGameManager extends Component
         return this.SlotProcessor.SkipRound();
     }
 
-    // Reward 完成後使用既有 Result 執行一次本局 Settlement
+    // Round 完成後依照 Spin Result 結算本局 Win 與 Balance
     private completeRound( spinResult: SpinResultData | null ): void
     {
-        if ( !this._isSettlementPending )
-        {
-            return;
-        }
-
-        this._isSettlementPending = false;
-
         if ( spinResult === null )
         {
             return;

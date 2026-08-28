@@ -33,6 +33,7 @@ export class GameUIController extends Component
     private _lastIsRoundRunning: boolean | null = null;
     // 上一次套用至 UI 的 Round Skip 狀態
     private _lastCanSkipRound: boolean | null = null;
+    // 保存上一次已套用至 UI 的數值，避免 update() 每幀重複設定 Label
     private _lastBalance: number | null = null;
     private _lastBet: number | null = null;
     private _lastWin: number | null = null;

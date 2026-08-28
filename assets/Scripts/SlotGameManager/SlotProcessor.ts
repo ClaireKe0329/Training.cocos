@@ -27,7 +27,7 @@ export class SlotProcessor extends Component
     // 目前是否正在處理單一 Round
     private _isRoundRunning: boolean = false;
 
-    // Reward 與 Settlement 完成後通知 SlotGameManager
+    // Round 完成後通知 SlotGameManager
     private _onRoundComplete: ( ( spinResult: SpinResultData | null ) => void ) | null = null;
 
     // 取得目前 Round 是否正在執行
@@ -42,7 +42,7 @@ export class SlotProcessor extends Component
         return this._isRoundRunning && ( this.ReelController?.CanSkipSpin ?? false );
     }
 
-    // Dependency 與 lifecycle 都允許時才可開始新 Round
+    // 目前是否可以開始新 Round
     public get CanStartRound(): boolean
     {
         return !this._isRoundRunning && this.ReelController !== null && this.RewardShowProcessor !== null && this.ReelController.CanStartSpin && this.RewardShowProcessor.CanShowReward;
@@ -98,7 +98,7 @@ export class SlotProcessor extends Component
         this.RewardShowProcessor!.ShowReward( this._spinResult, this.completeRound.bind( this ) );
     }
 
-    // Reward 完成後結束目前 Round 並通知 SlotGameManager Settlement
+    // Reward 完成後結束目前 Round 並通知 SlotGameManager
     private completeRound(): void
     {
         if ( !this._isRoundRunning )

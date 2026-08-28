@@ -145,6 +145,7 @@ export class SlotUnit extends Component
 
     private isAJQKSymbol(): boolean
     {
+        // A/J/K/Q 共用同一份 Spine，播放前需要依目前 Symbol 切換 Skin
         return this._currentSymbol === SymbolType.A || this._currentSymbol === SymbolType.J || this._currentSymbol === SymbolType.K || this._currentSymbol === SymbolType.Q;
     }
 }

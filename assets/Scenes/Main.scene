@@ -110,7 +110,7 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 640,
+      "x": 640.0000000000001,
       "y": 360.00000000000006,
       "z": 0
     },
@@ -501,8 +501,6 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "InitialBalance": 10000,
-    "InitialBet": 100,
     "SlotProcessor": {
       "__id__": 13
     },
@@ -1047,7 +1045,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1280,
+      "width": 1280.0000000000002,
       "height": 720
     },
     "_anchorPoint": {

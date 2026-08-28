@@ -9,6 +9,8 @@ const { ccclass, property } = _decorator;
 
 // 取得陣列中心的 SlotUnit Index，作為 SlotUnit 以 Reel 中心點排列的位置基準
 const POSITION_CENTER_INDEX: number = Math.floor( GameUtility.GetReelSlotUnitCount() / 2 );
+// SlotUnits 前方包含上方 Buffer，因此盤面 Row 0 從可視區起始 Index 開始
+const VISIBLE_START_INDEX: number = Math.floor( GameUtility.GetReelBufferUnitCount() / 2 );
 
 enum ReelState
 {
@@ -112,12 +114,7 @@ export class Reel extends Component
     // 要求目前可視區域指定 Row 的 SlotUnit 播放 Win
     public PlayWin( rowIndex: number ): void
     {
-        if ( rowIndex < 0 || rowIndex >= GameUtility.GetSlotRowCount() )
-        {
-            return;
-        }
-
-        const visibleIndex: number = rowIndex + 1;
+        const visibleIndex: number = rowIndex + VISIBLE_START_INDEX;
         this.SlotUnits[ visibleIndex ].PlayWin();
     }
 
