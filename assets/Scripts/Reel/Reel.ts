@@ -71,6 +71,11 @@ export class Reel extends Component
             return;
         }
 
+        for ( const slotUnit of this.SlotUnits )
+        {
+            slotUnit.ResetWin();
+        }
+
         this._fsMachine.ChangeState( ReelState.Run );
     }
 
@@ -104,16 +109,16 @@ export class Reel extends Component
         this.fixingPosition();
     }
 
-    // 取得目前可視區域指定 Row 的 SlotUnit
-    public GetVisibleSlotUnitByRow( rowIndex: number ): SlotUnit | null
+    // 要求目前可視區域指定 Row 的 SlotUnit 播放 Win
+    public PlayWin( rowIndex: number ): void
     {
         if ( rowIndex < 0 || rowIndex >= GameUtility.GetSlotRowCount() )
         {
-            return null;
+            return;
         }
 
         const visibleIndex: number = rowIndex + 1;
-        return this.SlotUnits[ visibleIndex ] ?? null;
+        this.SlotUnits[ visibleIndex ].PlayWin();
     }
 
     // 初始化狀態機

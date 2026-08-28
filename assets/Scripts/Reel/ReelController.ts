@@ -3,7 +3,6 @@ import { SymbolType } from '../GameData/SymbolType';
 import { GameConfig } from '../GameUtility/GameConfig';
 import { GameUtility } from '../GameUtility/GameUtility';
 import { Reel } from './Reel';
-import { SlotUnit } from './SlotUnit';
 
 const { ccclass, property } = _decorator;
 
@@ -118,15 +117,15 @@ export class ReelController extends Component
         this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
     }
 
-    // 取得目前可視區域指定座標的 SlotUnit
-    public GetVisibleSlotUnit( reelIndex: number, rowIndex: number ): SlotUnit | null
+    // 要求指定 Reel 與 Row 播放 Win
+    public PlayWin( reelIndex: number, rowIndex: number ): void
     {
         if ( reelIndex < 0 || reelIndex >= this.Reels.length )
         {
-            return null;
+            return;
         }
 
-        return this.Reels[ reelIndex ].GetVisibleSlotUnitByRow( rowIndex );
+        this.Reels[ reelIndex ].PlayWin( rowIndex );
     }
 
     // 有效結果存在時切換為快速停輪

@@ -1,7 +1,9 @@
-import { _decorator, Component, Enum, Sprite, SpriteFrame } from 'cc';
+import { _decorator, Component, Enum, Sprite, SpriteFrame, sp } from 'cc';
 import { SymbolType } from '../GameData/SymbolType';
 
 const { ccclass, property } = _decorator;
+
+const WIN_TRIGGER_ANIMATION: string = 'Trig';
 
 @ccclass( 'SlotUnit' )
 export class SlotUnit extends Component
@@ -18,6 +20,26 @@ export class SlotUnit extends Component
     @property( { type: Enum( SymbolType ) } )
     public InitialSymbol: SymbolType = SymbolType.A;
 
+    // 在目前 SlotUnit 位置播放 Win Spine 的播放器
+    @property( { type: sp.Skeleton } )
+    public WinEffectSkeleton: sp.Skeleton | null = null;
+
+    // A/J/K/Q 共用的 Win Spine，依 SymbolType 切換 Skin
+    @property( { type: sp.SkeletonData } )
+    public SymbolAJQKSpine: sp.SkeletonData | null = null;
+
+    @property( { type: sp.SkeletonData } )
+    public SymbolM1Spine: sp.SkeletonData | null = null;
+
+    @property( { type: sp.SkeletonData } )
+    public SymbolM2Spine: sp.SkeletonData | null = null;
+
+    @property( { type: sp.SkeletonData } )
+    public SymbolM3Spine: sp.SkeletonData | null = null;
+
+    @property( { type: sp.SkeletonData } )
+    public SymbolM4Spine: sp.SkeletonData | null = null;
+
     // 目前顯示的 Symbol
     private _currentSymbol: SymbolType = SymbolType.A;
 
@@ -31,6 +53,7 @@ export class SlotUnit extends Component
     protected onLoad(): void
     {
         this.SetSymbol( this.InitialSymbol );
+        this.ResetWin();
     }
 
     // 更新目前 Symbol 與對應的 SpriteFrame
@@ -52,6 +75,76 @@ export class SlotUnit extends Component
     // 將 SlotUnit 還原為初始 Symbol
     public Reset(): void
     {
+        this.ResetWin();
         this.SetSymbol( this.InitialSymbol );
+    }
+
+    // 依目前 Symbol 選擇對應 Spine 並播放固定 Trig 動畫
+    public PlayWin(): void
+    {
+        if ( this.WinEffectSkeleton === null )
+        {
+            return;
+        }
+
+        const spineData: sp.SkeletonData | null = this.getWinSpineData();
+
+        if ( spineData === null )
+        {
+            return;
+        }
+
+        this.ResetWin();
+        this.WinEffectSkeleton.skeletonData = spineData;
+
+        if ( this.isAJQKSymbol() )
+        {
+            this.WinEffectSkeleton.setSkin( SymbolType[ this._currentSymbol ] );
+        }
+
+        this.WinEffectSkeleton.enabled = true;
+        this.WinEffectSkeleton.setCompleteListener( this.ResetWin.bind( this ) );
+        this.WinEffectSkeleton.setAnimation( 0, WIN_TRIGGER_ANIMATION, false );
+    }
+
+    // 停止並隱藏目前 SlotUnit 的 Win Spine
+    public ResetWin(): void
+    {
+        if ( this.WinEffectSkeleton === null )
+        {
+            return;
+        }
+
+        this.WinEffectSkeleton.setCompleteListener( null );
+        this.WinEffectSkeleton.clearTracks();
+        this.WinEffectSkeleton.enabled = false;
+    }
+
+    // 依目前 Symbol 取得對應的 Win Spine 資產
+    private getWinSpineData(): sp.SkeletonData | null
+    {
+        switch ( this._currentSymbol )
+        {
+            case SymbolType.A:
+            case SymbolType.J:
+            case SymbolType.K:
+            case SymbolType.Q:
+                return this.SymbolAJQKSpine;
+            case SymbolType.M1:
+                return this.SymbolM1Spine;
+            case SymbolType.M2:
+                return this.SymbolM2Spine;
+            case SymbolType.M3:
+                return this.SymbolM3Spine;
+            case SymbolType.M4:
+                return this.SymbolM4Spine;
+            default:
+                return null;
+        }
+    }
+
+    private isAJQKSymbol(): boolean
+    {
+        return this._currentSymbol === SymbolType.A || this._currentSymbol === SymbolType.J || this._currentSymbol === SymbolType.K || this._currentSymbol === SymbolType.Q;
     }
 }

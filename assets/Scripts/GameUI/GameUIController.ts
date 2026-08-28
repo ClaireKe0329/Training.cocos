@@ -37,10 +37,6 @@ export class GameUIController extends Component
     private _lastBet: number | null = null;
     private _lastWin: number | null = null;
 
-    protected onLoad(): void
-    {
-    }
-
     // 每幀檢查按鈕狀態是否需要更新
     protected update(): void
     {

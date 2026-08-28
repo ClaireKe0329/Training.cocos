@@ -36,11 +36,6 @@ export class SlotProcessor extends Component
         return this._isRoundRunning;
     }
 
-    protected onLoad(): void
-    {
-        this.tryResolveDependencies();
-    }
-
     // 目前 Round 是否可以要求 Skip
     public get CanSkipRound(): boolean
     {
@@ -50,15 +45,12 @@ export class SlotProcessor extends Component
     // Dependency 與 lifecycle 都允許時才可開始新 Round
     public get CanStartRound(): boolean
     {
-        this.tryResolveDependencies();
-        return !this._isRoundRunning && this.ReelController !== null && this.RewardShowProcessor !== null && this.ReelController.CanStartSpin && !this.RewardShowProcessor.IsShowingReward;
+        return !this._isRoundRunning && this.ReelController !== null && this.RewardShowProcessor !== null && this.ReelController.CanStartSpin && this.RewardShowProcessor.CanShowReward;
     }
 
     // 啟動單一 Round，取得完整結果並交給 ReelController
     public StartRound( bet: number, onRoundComplete: ( spinResult: SpinResultData | null ) => void ): boolean
     {
-        this.tryResolveDependencies();
-
         if ( !this.CanStartRound || !this.ReelController!.StartSpin( this.onReelComplete.bind( this ) ) )
         {
             return false;
@@ -97,15 +89,13 @@ export class SlotProcessor extends Component
     // Reel 全部停止後使用同一份 Result 進入 Reward Flow
     private onReelComplete(): void
     {
-        if ( !this._isRoundRunning )
+        if ( this._spinResult === null )
         {
+            this.completeRound();
             return;
         }
 
-        if ( this._spinResult === null || !this.RewardShowProcessor || !this.ReelController || !this.RewardShowProcessor.ShowReward( this._spinResult, this.ReelController, this.completeRound.bind( this ) ) )
-        {
-            this.completeRound();
-        }
+        this.RewardShowProcessor!.ShowReward( this._spinResult, this.completeRound.bind( this ) );
     }
 
     // Reward 完成後結束目前 Round 並通知 SlotGameManager Settlement
@@ -140,24 +130,4 @@ export class SlotProcessor extends Component
         onRoundComplete?.( spinResult );
     }
 
-    // 當 Inspector 尚未綁定時，嘗試從場景中解析必要依賴
-    private tryResolveDependencies(): void
-    {
-        const sceneNode = this.node.scene;
-
-        if ( sceneNode === null )
-        {
-            return;
-        }
-
-        if ( this.ReelController === null )
-        {
-            this.ReelController = sceneNode.getComponentInChildren( ReelController );
-        }
-
-        if ( this.RewardShowProcessor === null )
-        {
-            this.RewardShowProcessor = sceneNode.getComponentInChildren( RewardShowProcessor );
-        }
-    }
 }
