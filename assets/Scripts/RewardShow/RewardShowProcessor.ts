@@ -32,18 +32,6 @@ export class RewardShowProcessor extends Component
         return !this._isShowingReward && this.ReelController !== null;
     }
 
-    // Component 停用時直接完成正在播放的 Reward，避免 SlotProcessor 一直等待
-    protected onDisable(): void
-    {
-        if ( this._isShowingReward )
-        {
-            this.completeReward();
-            return;
-        }
-
-        this.resetReward();
-    }
-
     // 依 Spin Result 的中獎位置播放 Win 表現
     public ShowReward( spinResult: SpinResultData, onRewardFinished: () => void ): void
     {
