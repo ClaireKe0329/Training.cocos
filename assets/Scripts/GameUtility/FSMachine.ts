@@ -5,7 +5,7 @@ export interface IStateEvent
     OnEnter?(): void;
 
     // State 持續期間每幀執行
-    OnUpdate( deltaTime: number ): void;
+    OnUpdate?( deltaTime: number ): void;
 
     // 離開 State 時執行一次
     OnExit?(): void;
@@ -62,7 +62,7 @@ export class FSMachine<TState>
             return this._currentState;
         }
 
-        this._stateEventMap.get( this._currentState )?.OnUpdate( deltaTime );
+        this._stateEventMap.get( this._currentState )?.OnUpdate?.( deltaTime );
         return this._currentState;
     }
 

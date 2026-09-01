@@ -54,6 +54,12 @@ export class SlotGameManager extends Component
         return this.SlotProcessor?.IsRoundRunning ?? false;
     }
 
+    // 目前是否可以開始新的 Round
+    public get CanStartRound(): boolean
+    {
+        return ( this.SlotProcessor?.CanStartRound ?? false ) && this._balance >= this._bet;
+    }
+
     // 目前 Round 是否可以要求 Skip
     public get CanSkipRound(): boolean
     {
@@ -61,39 +67,30 @@ export class SlotGameManager extends Component
     }
 
     // 啟動單一 Round
-    public StartRound(): boolean
+    public StartRound(): void
     {
-        if ( !this.SlotProcessor || !this.SlotProcessor.CanStartRound || this._balance < this._bet )
+        if ( !this.CanStartRound )
         {
-            return false;
+            return;
         }
 
-        // Round 開始時先固定本局 Bet、清除上一局 Win，並扣除下注金額
         const roundBet: number = this._bet;
-        const previousWin: number = this._win;
+        this.SlotProcessor.StartRound( roundBet, this.completeRound.bind( this ) );
+
+        // Round 成功進入 Spinning 後才清除上一局 Win 並扣除本局 Bet
         this._win = 0;
         this._balance -= roundBet;
-
-        // Round 未成功啟動時還原已扣除的 Bet 與上一局 Win
-        if ( !this.SlotProcessor.StartRound( roundBet, this.completeRound.bind( this ) ) )
-        {
-            this._balance += roundBet;
-            this._win = previousWin;
-            return false;
-        }
-
-        return true;
     }
 
     // 將玩家的 Skip 操作交給目前 Round
-    public SkipRound(): boolean
+    public SkipRound(): void
     {
-        if ( !this.SlotProcessor )
+        if ( !this.CanSkipRound )
         {
-            return false;
+            return;
         }
 
-        return this.SlotProcessor.SkipRound();
+        this.SlotProcessor.SkipRound();
     }
 
     // Round 完成後依照 Spin Result 結算本局 Win 與 Balance
