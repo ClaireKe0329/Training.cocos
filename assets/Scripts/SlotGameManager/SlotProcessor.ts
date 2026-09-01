@@ -138,7 +138,7 @@ export class SlotProcessor extends Component
     // 進入 Spinning 時啟動 Reel，並取得本局完整 Spin Result
     private enterSpinning(): void
     {
-        this.ReelController.StartSpin( this.onReelComplete.bind( this ) );
+        this.ReelController.StartSpin( this.onReelSpinFinished.bind( this ) );
 
         const spinResult: SpinResultData | null = this._spinResultProvider.GetSpinResult( this._roundBet );
 
@@ -155,8 +155,8 @@ export class SlotProcessor extends Component
         console.log( '[SlotProcessor] 取得盤面結果', spinResult.SlotGrids.map( ( reelSymbols: SymbolType[] ) => reelSymbols.map( ( symbol: SymbolType ) => SymbolType[ symbol ] ) ) );
     }
 
-    // Reel 全部完成後離開 Spinning，依本局 Result 決定是否進入 Reward
-    private onReelComplete(): void
+    // Reel Spin 全部完成後離開 Spinning，依本局 Result 決定是否進入 Reward
+    private onReelSpinFinished(): void
     {
         if ( this._fsMachine.CurrentState !== SlotProcessorState.Spinning )
         {
@@ -175,11 +175,11 @@ export class SlotProcessor extends Component
     // 進入 ShowingReward 時播放本局既有 Result 的 Reward
     private enterShowingReward(): void
     {
-        this.RewardShowProcessor.ShowReward( this._spinResult, this.onRewardComplete.bind( this ) );
+        this.RewardShowProcessor.ShowReward( this._spinResult, this.onRewardFinished.bind( this ) );
     }
 
     // Reward 完成後進入 Round Complete
-    private onRewardComplete(): void
+    private onRewardFinished(): void
     {
         if ( this._fsMachine.CurrentState !== SlotProcessorState.ShowingReward )
         {

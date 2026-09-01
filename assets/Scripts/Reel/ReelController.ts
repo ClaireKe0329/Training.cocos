@@ -1,206 +1,284 @@
 import { _decorator, Component } from 'cc';
 import { SymbolType } from '../GameData/SymbolType';
+import { FSMachine } from '../GameUtility/FSMachine';
 import { GameConfig } from '../GameUtility/GameConfig';
 import { GameUtility } from '../GameUtility/GameUtility';
 import { Reel } from './Reel';
 
 const { ccclass, property } = _decorator;
 
-// 負責多軸 Reel 的 Start、Stop Sequence、Stop Interval、Skip 與全部完成通知
+enum ReelControllerState
+{
+    // 尚未開始 Spin，可以接受下一次 StartSpin
+    Idle,
+
+    // 所有 Reel 持續運轉，等待停輪時間與盤面結果準備完成
+    Spinning,
+
+    // 開始通知各 Reel 停輪，並等待所有 Reel 真正停止
+    Stopping,
+
+    // 所有 Reel 都已停止，本次 Spin 準備結束
+    Complete,
+}
+
+// 負責控制所有 Reel 的開始、依序停輪、快速停輪與完成時機
 @ccclass( 'ReelController' )
 export class ReelController extends Component
 {
-    // 由 Controller 管理的所有 Reel
+    // 目前由 ReelController 控制的所有 Reel
     @property( { type: [ Reel ] } )
     public Reels: Reel[] = [];
 
-    // 目前是否正在進行 Reel Spin
-    private _isSpinRunning: boolean = false;
+    // 管理目前多軸 Reel 的執行狀態
+    private _fsMachine: FSMachine<ReelControllerState> = new FSMachine( ReelControllerState.Idle );
 
-    // 目前是否已開始進行停輪流程
-    private _isStopping: boolean = false;
-
-    // 玩家是否已要求快速停輪
+    // 本次 Spin 是否已接受玩家的快速停輪要求
     private _isSkipRequested: boolean = false;
 
-    // 是否還有 Reel 尚未收到 StopSpin Command
-    private _hasPendingReelStop: boolean = false;
-
-    // 目前這一局 Reel 已累計的運轉時間
+    // 本次 Spin 已經運轉的時間
     private _spinElapsedTime: number = 0;
 
-    // 目前一局各 Reel 的最終停輪結果
+    // 自動停輪時距離下一軸停輪已經過的時間
+    private _stopIntervalElapsedTime: number = 0;
+
+    // 下一個還沒收到 StopSpin 的 Reel Index
+    private _nextStopReelIndex: number = 0;
+
+    // 本次 Spin 各 Reel 最後要停下來的盤面結果
     private _reelResults: SymbolType[][] | null = null;
 
-    // Reel Spin 全部完成時的通知
-    private _onSpinComplete: ( () => void ) | null = null;
+    // 所有 Reel 停止並完成重設後通知 SlotProcessor
+    private _onSpinFinished: ( () => void ) | null = null;
 
-    // Spin 期間是否允許玩家送出 Skip 操作
+    // Spin 尚未結束且仍可接受 Skip 操作時允許玩家按下 Skip
     public get CanSkipSpin(): boolean
     {
-        return this._isSpinRunning && this._hasPendingReelStop && !this._isSkipRequested;
-    }
-
-    // 目前 Controller 與 Reel 數量是否允許開始新的 Spin
-    public get CanStartSpin(): boolean
-    {
-        return !this._isSpinRunning && this.Reels.length === GameUtility.GetSlotColumnCount();
-    }
-
-    // 依目前階段處理 Spin 計時或等待所有 Reel 運轉完成，最後重設狀態
-    protected update( deltaTime: number ): void
-    {
-        // 沒有進行中的 Spin 時不處理本幀
-        if ( !this._isSpinRunning )
-        {
-            return;
-        }
-
-        // 尚未開始停輪時累計運轉時間，並檢查目前是否符合停輪條件
-        if ( !this._isStopping )
-        {
-            this._spinElapsedTime += deltaTime;
-            this.tryStopSpin();
-            return;
-        }
-
-        // 已開始停輪時等待所有 Reel 完成 Stop 與 Shock 並回到 Idle
-        if ( this.Reels.some( ( reel: Reel ): boolean => reel.IsRunning ) )
-        {
-            return;
-        }
-
-        // 所有 Reel 都完成後才清除本局 Controller 狀態
-        this.completeSpin();
-    }
-
-    // Component 停用時取消停輪間隔的排程，並同步結束進行中的 Reel Spin
-    protected onDisable(): void
-    {
-        this.unscheduleAllCallbacks();
-
-        if ( this._isSpinRunning )
-        {
-            this.completeSpin();
-            return;
-        }
-
-        this.resetSpinState();
-    }
-
-    // 啟動所有 Reel 進行 Spin
-    public StartSpin( onSpinComplete: () => void ): boolean
-    {
-        if ( !this.CanStartSpin )
+        if ( this._isSkipRequested )
         {
             return false;
         }
 
-        this._isSpinRunning = true;
-        this._isStopping = false;
-        this._isSkipRequested = false;
-        this._hasPendingReelStop = true;
-        this._spinElapsedTime = 0;
-        this._reelResults = null;
-        this._onSpinComplete = onSpinComplete;
-
-        for ( const reel of this.Reels )
+        if ( this._fsMachine.CurrentState === ReelControllerState.Spinning )
         {
-            reel.StartSpin();
+            return true;
         }
 
-        return true;
+        return this._fsMachine.CurrentState === ReelControllerState.Stopping
+            && this._nextStopReelIndex < this.Reels.length;
     }
 
-    // 保存本局最終盤面，等待最低 Spin 時間或 Skip 條件成立後開始停輪
+    // 只有目前沒有進行中的 Spin，且 Reel 數量正確時才能開始下一次 Spin
+    public get CanStartSpin(): boolean
+    {
+        return this._fsMachine.CurrentState === ReelControllerState.Idle
+            && this.Reels.length === GameUtility.GetSlotColumnCount();
+    }
+
+    // Component 載入時建立 ReelController 使用的狀態機
+    protected onLoad(): void
+    {
+        this.initFSM();
+    }
+
+    // 每幀執行目前 State 對應的處理
+    protected update( deltaTime: number ): void
+    {
+        this._fsMachine.Tick( deltaTime );
+    }
+
+    // 開始本次 Spin
+    public StartSpin( onSpinFinished: () => void ): void
+    {
+        if ( !this.CanStartSpin )
+        {
+            return;
+        }
+
+        this._onSpinFinished = onSpinFinished;
+        this._fsMachine.ChangeState( ReelControllerState.Spinning );
+    }
+
+    // 保存本次 Spin 最後要顯示的盤面，之後由停輪流程使用
     public SetSpinResult( reelResults: SymbolType[][] ): void
     {
         this._reelResults = reelResults.map( ( stopSymbols: SymbolType[] ): SymbolType[] => [ ...stopSymbols ] );
     }
 
-    // 要求指定 Reel 與 Row 播放 Win
+    // 要求指定 Reel 上的 SlotUnit 播放中獎表現
     public PlayWin( reelIndex: number, rowIndex: number ): void
     {
         this.Reels[ reelIndex ].PlayWin( rowIndex );
     }
 
-    // 有效結果存在時切換為快速停輪
-    public SkipSpin(): boolean
+    // 玩家要求快速停輪；結果尚未準備完成時，本次操作不生效也不保存
+    public SkipSpin(): void
     {
-        // 目前不可 Skip 或尚未取得停輪結果時不處理
         if ( !this.CanSkipSpin || this._reelResults === null )
         {
-            return false;
+            return;
         }
 
         this._isSkipRequested = true;
-        return true;
+
+        // 尚在等待自動停輪時間時，直接開始停輪
+        if ( this._fsMachine.CurrentState === ReelControllerState.Spinning )
+        {
+            this._fsMachine.ChangeState( ReelControllerState.Stopping );
+            return;
+        }
+
+        // 已經開始依序停輪時，直接通知剩下的 Reel 停輪
+        this.stopAllPendingReels();
     }
 
-    // 自動停輪時等待最低 Spin 時間，快速停輪則直接開始停輪
-    private tryStopSpin(): void
+    // 設定每個 State 進入後需要執行的處理
+    private initFSM(): void
     {
+        this._fsMachine.RegisterStateEvent( ReelControllerState.Idle, {
+            OnEnter: this.enterIdle.bind( this ),
+        } );
+
+        this._fsMachine.RegisterStateEvent( ReelControllerState.Spinning, {
+            OnEnter: this.enterSpinning.bind( this ),
+            OnUpdate: this.updateSpinning.bind( this ),
+        } );
+
+        this._fsMachine.RegisterStateEvent( ReelControllerState.Stopping, {
+            OnEnter: this.enterStopping.bind( this ),
+            OnUpdate: this.updateStopping.bind( this ),
+        } );
+
+        this._fsMachine.RegisterStateEvent( ReelControllerState.Complete, {
+            OnEnter: this.enterComplete.bind( this ),
+        } );
+
+        this._fsMachine.Start();
+    }
+
+    // 回到 Idle 時清除上一輪 Spin 使用的資料
+    private enterIdle(): void
+    {
+        this._isSkipRequested = false;
+        this._spinElapsedTime = 0;
+        this._stopIntervalElapsedTime = 0;
+        this._nextStopReelIndex = 0;
+        this._reelResults = null;
+        this._onSpinFinished = null;
+    }
+
+    // 進入 Spinning 時讓所有 Reel 同時開始滾動
+    private enterSpinning(): void
+    {
+        this._spinElapsedTime = 0;
+
+        for ( const reel of this.Reels )
+        {
+            reel.StartSpin();
+        }
+    }
+
+    // 等待最低 Spin 時間與盤面結果都準備完成後開始自動停輪
+    private updateSpinning( deltaTime: number ): void
+    {
+        this._spinElapsedTime += deltaTime;
+
         if ( this._reelResults === null )
         {
             return;
         }
 
-        // 自動停輪必須等到最低運轉時間
-        if ( !this._isSkipRequested && this._spinElapsedTime < GameConfig.GetInstance().SpinDuration )
+        if ( this._spinElapsedTime < GameConfig.GetInstance().SpinDuration )
         {
             return;
         }
 
-        this._isStopping = true;
-        this.runReelStopSequence( this._reelResults );
+        this._fsMachine.ChangeState( ReelControllerState.Stopping );
     }
 
-    // 依序通知每一軸 Reel 停輪，快速停輪會略過剩餘間隔
-    private async runReelStopSequence( reelResults: SymbolType[][] ): Promise<void>
+    // 進入 Stopping 時開始送出各 Reel 的 StopSpin
+    private enterStopping(): void
     {
-        for ( let reelIndex: number = 0; reelIndex < this.Reels.length; reelIndex++ )
-        {
-            this.Reels[ reelIndex ].StopSpin( reelResults[ reelIndex ] );
+        this._nextStopReelIndex = 0;
+        this._stopIntervalElapsedTime = 0;
 
-            let nowWaitingTime: number = 0;
-            // 自動停輪時等待停軸間隔，快速停輪直接處理下一軸
-            while ( !this._isSkipRequested && nowWaitingTime < GameConfig.GetInstance().ReelStopInterval && reelIndex < this.Reels.length - 1 )
+        const reelStopInterval: number = GameConfig.GetInstance().ReelStopInterval;
+
+        // 快速停輪或沒有停軸間隔時，進入 Stopping 當下就通知所有 Reel 停輪
+        if ( this._isSkipRequested || reelStopInterval === 0 )
+        {
+            this.stopAllPendingReels();
+            return;
+        }
+
+        // 自動停輪先立即停止第一軸，後續 Reel 再依 ReelStopInterval 停止
+        this.stopNextReel();
+    }
+
+    // 依目前停輪方式通知剩餘 Reel，全部送出 StopSpin 後再等待所有 Reel 完整停止
+    private updateStopping( deltaTime: number ): void
+    {
+        // 還有 Reel 沒收到 StopSpin 時，繼續處理自動停輪或快速停輪
+        if ( this._nextStopReelIndex < this.Reels.length )
+        {
+            if ( this._isSkipRequested )
             {
-                await this.waitTime( 0.05 );
-                nowWaitingTime += 0.05;
+                this.stopAllPendingReels();
+            }
+            else
+            {
+                this.updateAutoStopSequence( deltaTime );
             }
         }
 
-        // 所有 Reel 都已收到 StopSpin Command
-        this._hasPendingReelStop = false;
-    }
-
-    // 重設狀態後通知上層 Reel Spin 已完整結束
-    private completeSpin(): void
-    {
-        const onSpinComplete: ( () => void ) | null = this._onSpinComplete;
-        this.resetSpinState();
-        onSpinComplete?.();
-    }
-
-    // 重設目前 Spin 與 Stop 流程相關狀態
-    private resetSpinState(): void
-    {
-        this._isSpinRunning = false;
-        this._isStopping = false;
-        this._isSkipRequested = false;
-        this._hasPendingReelStop = false;
-        this._spinElapsedTime = 0;
-        this._reelResults = null;
-        this._onSpinComplete = null;
-    }
-
-    // 等待指定秒數後繼續執行目前非同步流程
-    private waitTime( seconds: number ): Promise<void>
-    {
-        return new Promise( ( resolve: () => void ): void =>
+        // StopSpin 全部送出不代表 Reel 已停下，仍要等 Stop 與 Shock 完成後回到 Idle
+        if ( this.Reels.some( ( reel: Reel ): boolean => reel.IsRunning ) )
         {
-            this.scheduleOnce( resolve, seconds );
-        } );
+            return;
+        }
+
+        this._fsMachine.ChangeState( ReelControllerState.Complete );
+    }
+
+    // 自動停輪時依 ReelStopInterval 依序通知下一軸停輪
+    private updateAutoStopSequence( deltaTime: number ): void
+    {
+        const reelStopInterval: number = GameConfig.GetInstance().ReelStopInterval;
+
+        this._stopIntervalElapsedTime += deltaTime;
+
+        // 若這一幀已經經過多個停軸間隔，就把這些時間內應該停下的 Reel 一次處理完
+        while ( this._nextStopReelIndex < this.Reels.length && this._stopIntervalElapsedTime >= reelStopInterval )
+        {
+            this._stopIntervalElapsedTime -= reelStopInterval;
+            this.stopNextReel();
+        }
+    }
+
+    // 將下一個尚未收到 StopSpin 的 Reel 切入停輪流程
+    private stopNextReel(): void
+    {
+        const reelIndex: number = this._nextStopReelIndex;
+        this.Reels[ reelIndex ].StopSpin( this._reelResults[ reelIndex ] );
+        this._nextStopReelIndex++;
+    }
+
+    // 快速停輪時一次通知所有剩餘 Reel 停輪
+    private stopAllPendingReels(): void
+    {
+        while ( this._nextStopReelIndex < this.Reels.length )
+        {
+            this.stopNextReel();
+        }
+    }
+
+    // 本次 Spin 完成後先回到 Idle 重設資料，再通知 SlotProcessor
+    private enterComplete(): void
+    {
+        const onSpinFinished: ( () => void ) | null = this._onSpinFinished;
+
+        this._fsMachine.ChangeState( ReelControllerState.Idle );
+
+        onSpinFinished?.();
     }
 }
