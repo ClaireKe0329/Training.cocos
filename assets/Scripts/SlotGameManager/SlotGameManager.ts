@@ -18,12 +18,13 @@ export class SlotGameManager extends Component
     @property( { type: PlayerInfo } )
     public PlayerInfo: PlayerInfo | null = null;
 
-    // 玩家目前選擇的 Reel Speed Level
+    // 玩家目前選擇的 Reel Speed Level；Round 進行中不允許切換
     private _reelSpeedLevel: ReelSpeedLevel = ReelSpeedLevel.Normal;
 
-    public get ReelSpeedLevel(): ReelSpeedLevel
+    // UI 只需要知道 Turbo 是否啟用，不直接依賴 Reel Speed 的完整類型
+    public get IsTurbo(): boolean
     {
-        return this._reelSpeedLevel;
+        return this._reelSpeedLevel === ReelSpeedLevel.Turbo;
     }
 
     // 目前是否正在處理單一 Round
@@ -44,7 +45,7 @@ export class SlotGameManager extends Component
         return this.SlotProcessor?.CanSkipRound ?? false;
     }
 
-    // 切換 Normal / Turbo Mode
+    // 在 Round 之間切換 Normal / Turbo；目前 Round 的速度一旦開始就不再變更
     public ToggleTurbo(): void
     {
         if ( this.IsRoundRunning )

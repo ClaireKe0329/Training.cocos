@@ -1,7 +1,6 @@
 import { _decorator, Button, Component, Label } from 'cc';
 import { SlotGameManager } from '../SlotGameManager/SlotGameManager';
 import { PlayerInfo } from '../Player/PlayerInfo';
-import { ReelSpeedLevel } from '../Reel/ReelSpeed';
 
 const { ccclass, property } = _decorator;
 
@@ -17,11 +16,11 @@ export class GameUIController extends Component
     @property( { type: Button } )
     public StopButton: Button | null = null;
 
-    // Turbo 關閉中的按鈕
+    // Turbo 關閉時顯示的按鈕
     @property( { type: Button } )
     public TurboOffButton: Button | null = null;
 
-    // Turbo 啟用中的按鈕
+    // Turbo 啟用時顯示的按鈕
     @property( { type: Button } )
     public TurboOnButton: Button | null = null;
 
@@ -49,9 +48,8 @@ export class GameUIController extends Component
     private _lastIsRoundRunning: boolean | null = null;
     // 上一次套用至 UI 的 Round Skip 狀態
     private _lastCanSkipRound: boolean | null = null;
-
-    // 上一次套用至 UI 的 SpeedLevel
-    private _lastSpeedLevel: ReelSpeedLevel | null = null;
+    // 上一次套用至 UI 的 Turbo 狀態
+    private _lastIsTurbo: boolean | null = null;
 
     // 保存上一次已套用至 UI 的數值，避免 update() 每幀重複設定 Label
     private _lastBalance: number | null = null;
@@ -85,7 +83,7 @@ export class GameUIController extends Component
         this.TurboOnButton?.node.off( Button.EventType.CLICK, this.onTurboButtonClick, this );
         this._lastIsRoundRunning = null;
         this._lastCanSkipRound = null;
-        this._lastSpeedLevel = null;
+        this._lastIsTurbo = null;
         this._lastBalance = null;
         this._lastBet = null;
         this._lastWin = null;
@@ -111,7 +109,7 @@ export class GameUIController extends Component
         this.SlotGameManager.SkipRound();
     }
 
-    // 根據Turbo按鈕的點擊，通知 SlotGameManager 切換目前的 SpeedLevel，以及更新按鈕狀態
+    // 將玩家的 Turbo 切換操作交給 SlotGameManager
     private onTurboButtonClick(): void
     {
         if ( !this.SlotGameManager )
@@ -123,7 +121,7 @@ export class GameUIController extends Component
         this.updateButtonState();
     }
 
-    // 依照目前 Round 與 Skip 狀態更新按鈕顯示
+    // 依照目前 Round、Skip 與 Turbo 狀態更新按鈕顯示
     private updateButtonState(): void
     {
         // 必要元件尚未設定完成時不更新 UI
@@ -134,23 +132,24 @@ export class GameUIController extends Component
 
         const isRoundRunning: boolean = this.SlotGameManager.IsRoundRunning;
         const canSkipRound: boolean = this.SlotGameManager.CanSkipRound;
-        const speedLevel: ReelSpeedLevel = this.SlotGameManager.ReelSpeedLevel;
-        const isTurbo: boolean = speedLevel === ReelSpeedLevel.Turbo;
+        const isTurbo: boolean = this.SlotGameManager.IsTurbo;
 
-        // Round 、Turbo 與 Skip 狀態沒有改變時不重複更新按鈕
-        if ( this._lastIsRoundRunning === isRoundRunning && this._lastCanSkipRound === canSkipRound && this._lastSpeedLevel === speedLevel )
+        // Round、Turbo 與 Skip 狀態沒有改變時不重複更新按鈕
+        if ( this._lastIsRoundRunning === isRoundRunning && this._lastCanSkipRound === canSkipRound && this._lastIsTurbo === isTurbo )
         {
             return;
         }
-        this._lastSpeedLevel = speedLevel;
+
         this._lastIsRoundRunning = isRoundRunning;
         this._lastCanSkipRound = canSkipRound;
+        this._lastIsTurbo = isTurbo;
 
         // Round 進行中顯示 Stop Button，並依目前狀態決定是否允許 Skip
         this.SpinButton.node.active = !isRoundRunning;
         this.StopButton.node.active = isRoundRunning;
         this.StopButton.interactable = canSkipRound;
-        // 根據目前的 Turbo 狀態更新 Turbo 按鈕顯示，以及是否允許操作
+
+        // Turbo 只在 Round 之間允許切換，UI 只呈現 SlotGameManager 保存的模式
         this.TurboOffButton.node.active = !isTurbo;
         this.TurboOnButton.node.active = isTurbo;
         this.TurboOffButton.interactable = !isRoundRunning;

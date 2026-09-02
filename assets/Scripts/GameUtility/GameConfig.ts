@@ -150,14 +150,15 @@ export class GameConfig
         return this._config;
     }
 
-
+    // 確認三種 Reel Speed 設定存在，且各自的速度與時間可正常使用
     private validateReelSpeedSettings( reelSpeedSettings: IReelSpeedSettings ): void
     {
-        const normal: IReelSpeedSetting = reelSpeedSettings.Normal;
-        const turbo: IReelSpeedSetting = reelSpeedSettings.Turbo;
-        const skip: IReelSpeedSetting = reelSpeedSettings.Skip;
+        if ( !reelSpeedSettings?.Normal || !reelSpeedSettings.Turbo || !reelSpeedSettings.Skip )
+        {
+            throw new Error( '[GameConfig] 缺少 Normal、Turbo 或 Skip 的 Reel Speed 設定。' );
+        }
 
-        const speedSettings: IReelSpeedSetting[] = [ normal, turbo, skip ];
+        const speedSettings: IReelSpeedSetting[] = [ reelSpeedSettings.Normal, reelSpeedSettings.Turbo, reelSpeedSettings.Skip ];
 
         for ( const speedSetting of speedSettings )
         {
@@ -165,11 +166,6 @@ export class GameConfig
             {
                 throw new Error( '[GameConfig] Reel Speed 設定不合法。' );
             }
-        }
-
-        if ( normal.SpinSpeed >= turbo.SpinSpeed || turbo.SpinSpeed >= skip.SpinSpeed )
-        {
-            throw new Error( '[GameConfig] Reel Speed 必須符合 Normal < Turbo < Skip。' );
         }
     }
 

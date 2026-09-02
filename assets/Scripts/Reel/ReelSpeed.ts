@@ -1,3 +1,4 @@
+// Reel 運轉速度等級；Normal / Turbo 在 Round 開始前選擇，Skip 只由進行中的 Skip Flow 切入
 export enum ReelSpeedLevel
 {
     Normal,
