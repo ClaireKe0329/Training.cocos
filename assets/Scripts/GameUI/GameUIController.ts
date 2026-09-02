@@ -1,8 +1,10 @@
 import { _decorator, Button, Component, Label } from 'cc';
 import { SlotGameManager } from '../SlotGameManager/SlotGameManager';
+import { PlayerInfo } from '../Player/PlayerInfo';
+
 const { ccclass, property } = _decorator;
 
-// 負責玩家操作與 UI 顯示，只讀取公開 Game Data，不決定遊戲結果與流程
+// 負責玩家操作與 UI 顯示；Round 操作交給 SlotGameManager，玩家資料只從 PlayerInfo 讀取
 @ccclass( 'GameUIController' )
 export class GameUIController extends Component
 {
@@ -22,13 +24,17 @@ export class GameUIController extends Component
     @property( { type: Label } )
     public BetLabel: Label | null = null;
 
-    // 顯示最近完成一局的 Win
+    // 顯示目前一局的 Win
     @property( { type: Label } )
     public WinLabel: Label | null = null;
 
     // 提供 Round 狀態與操作入口的 SlotGameManager
     @property( { type: SlotGameManager } )
     public SlotGameManager: SlotGameManager | null = null;
+
+    // 提供 Balance、Bet、Win 顯示資料；GameUIController 只讀取，不修改玩家資料
+    @property( { type: PlayerInfo } )
+    public PlayerInfo: PlayerInfo | null = null;
 
     // 上一次套用至 UI 的 Round 狀態
     private _lastIsRoundRunning: boolean | null = null;
@@ -39,7 +45,7 @@ export class GameUIController extends Component
     private _lastBet: number | null = null;
     private _lastWin: number | null = null;
 
-    // 每幀檢查按鈕狀態是否需要更新
+    // 每幀檢查按鈕狀態與玩家資料是否需要更新
     protected update(): void
     {
         this.updateButtonState();
@@ -114,17 +120,17 @@ export class GameUIController extends Component
         this.StopButton.interactable = canSkipRound;
     }
 
-    // 讀取 SlotGameManager 公開資料並更新 Balance、Bet、Win 顯示
+    // 直接讀取 PlayerInfo，更新 Balance、Bet、Win 顯示
     private updateGameDataView(): void
     {
-        if ( !this.SlotGameManager || !this.BalanceLabel || !this.BetLabel || !this.WinLabel )
+        if ( !this.PlayerInfo || !this.BalanceLabel || !this.BetLabel || !this.WinLabel )
         {
             return;
         }
 
-        const balance: number = this.SlotGameManager.Balance;
-        const bet: number = this.SlotGameManager.Bet;
-        const win: number = this.SlotGameManager.Win;
+        const balance: number = this.PlayerInfo.Balance;
+        const bet: number = this.PlayerInfo.Bet;
+        const win: number = this.PlayerInfo.Win;
 
         if ( this._lastBalance !== balance )
         {

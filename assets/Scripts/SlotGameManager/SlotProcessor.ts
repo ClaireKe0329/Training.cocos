@@ -48,6 +48,9 @@ export class SlotProcessor extends Component
     // 管理目前單一 Round 所在的流程階段
     private _fsMachine: FSMachine<SlotProcessorState> = new FSMachine( SlotProcessorState.Idle );
 
+    // 進入 ShowingReward 時通知 SlotGameManager 更新 Win 顯示
+    private _onRewardStarted: ( ( spinResult: SpinResultData ) => void ) | null = null;
+
     // Round Complete 並 Reset 後通知 SlotGameManager
     private _onRoundFinished: ( ( spinResult: SpinResultData | null ) => void ) | null = null;
 
@@ -80,8 +83,8 @@ export class SlotProcessor extends Component
         this.initFSM();
     }
 
-    // 啟動單一 Round
-    public StartRound( bet: number, onRoundFinished: ( spinResult: SpinResultData | null ) => void ): void
+    // 啟動單一 Round，並保存 Reward Started 與 Round Finished 的一對一通知
+    public StartRound( bet: number, onRewardStarted: ( spinResult: SpinResultData ) => void, onRoundFinished: ( spinResult: SpinResultData | null ) => void ): void
     {
         if ( !this.CanStartRound )
         {
@@ -89,6 +92,7 @@ export class SlotProcessor extends Component
         }
 
         this._roundBet = bet;
+        this._onRewardStarted = onRewardStarted;
         this._onRoundFinished = onRoundFinished;
 
         this._fsMachine.ChangeState( SlotProcessorState.Spinning );
@@ -127,11 +131,12 @@ export class SlotProcessor extends Component
         this._fsMachine.Start();
     }
 
-    // 進入 Idle 時清除上一局 lifecycle data，準備接受下一個 Round
+    // 進入 Idle 時清除上一局 lifecycle data 與 callbacks，準備接受下一個 Round
     private enterIdle(): void
     {
         this._spinResult = null;
         this._roundBet = 0;
+        this._onRewardStarted = null;
         this._onRoundFinished = null;
     }
 
@@ -172,9 +177,10 @@ export class SlotProcessor extends Component
         this._fsMachine.ChangeState( SlotProcessorState.ShowingReward );
     }
 
-    // 進入 ShowingReward 時播放本局既有 Result 的 Reward
+    // ShowingReward 一進入就先通知上層顯示 Win，再由 RewardShowProcessor 控制演出時間
     private enterShowingReward(): void
     {
+        this._onRewardStarted?.( this._spinResult );
         this.RewardShowProcessor.ShowReward( this._spinResult, this.onRewardFinished.bind( this ) );
     }
 
