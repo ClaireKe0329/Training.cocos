@@ -2,24 +2,19 @@ import { JsonAsset } from 'cc';
 import { GameUtility } from './GameUtility';
 import { SYMBOL_TYPE_LIST, SymbolType } from '../GameData/SymbolType';
 import { ISymbolMultiplier } from '../GameData/SymbolMultiplier';
+import { IReelSpeedSettings, IReelSpeedSetting } from '../Reel/ReelSpeed';
 
 // 定義 config.json 載入後必須提供的遊戲設定
 export interface IGameConfig
 {
-    // Reel 每秒移動速度
-    readonly SpinSpeed: number;
+    // Reel 的 Normal、Turbo、Skip 三種速度設定
+    readonly ReelSpeedSettings: IReelSpeedSettings;
 
     // Reel 停止時 Shock 的最大位移距離
     readonly ShockDistance: number;
 
     // Reel Shock 動畫持續時間
     readonly ShockDuration: number;
-
-    // 各 Reel 依序收到 Stop Command 的時間間隔
-    readonly ReelStopInterval: number;
-
-    // 自動停輪前最少需要運轉的時間
-    readonly SpinDuration: number;
 
     // 遊戲啟動時的初始 Balance
     readonly InitialBalance: number;
@@ -73,10 +68,11 @@ export class GameConfig
         const config = configJson.json as IGameConfig;
 
         // 檢查 Reel 運作所需的基本數值設定
-        if ( config.SpinSpeed <= 0 || config.ShockDistance < 0 || config.ShockDuration <= 0 || config.ReelStopInterval < 0 || config.SpinDuration < 0 )
+        if ( config.ShockDistance < 0 || config.ShockDuration <= 0 )
         {
-            throw new Error( '[GameConfig] Reel 的速度、距離或時間設定不合法。' );
+            throw new Error( '[GameConfig] Reel 的 Shock 設定不合法。' );
         }
+        this.validateReelSpeedSettings( config.ReelSpeedSettings );
 
         // 檢查遊戲初始資料與 Reward 顯示時間
         if (
@@ -94,11 +90,6 @@ export class GameConfig
         this._config = config;
     }
 
-    public get SpinSpeed(): number
-    {
-        return this.getConfig().SpinSpeed;
-    }
-
     public get ShockDistance(): number
     {
         return this.getConfig().ShockDistance;
@@ -109,14 +100,16 @@ export class GameConfig
         return this.getConfig().ShockDuration;
     }
 
-    public get ReelStopInterval(): number
+    // 回傳副本，避免外部直接修改 Config 內的 ReelSpeedSettings
+    public get ReelSpeedSettings(): IReelSpeedSettings
     {
-        return this.getConfig().ReelStopInterval;
-    }
+        const reelSpeedSettings: IReelSpeedSettings = this.getConfig().ReelSpeedSettings;
 
-    public get SpinDuration(): number
-    {
-        return this.getConfig().SpinDuration;
+        return {
+            Normal: { ...reelSpeedSettings.Normal },
+            Turbo: { ...reelSpeedSettings.Turbo },
+            Skip: { ...reelSpeedSettings.Skip },
+        };
     }
 
     public get InitialBalance(): number
@@ -155,6 +148,29 @@ export class GameConfig
         }
 
         return this._config;
+    }
+
+
+    private validateReelSpeedSettings( reelSpeedSettings: IReelSpeedSettings ): void
+    {
+        const normal: IReelSpeedSetting = reelSpeedSettings.Normal;
+        const turbo: IReelSpeedSetting = reelSpeedSettings.Turbo;
+        const skip: IReelSpeedSetting = reelSpeedSettings.Skip;
+
+        const speedSettings: IReelSpeedSetting[] = [ normal, turbo, skip ];
+
+        for ( const speedSetting of speedSettings )
+        {
+            if ( speedSetting.SpinSpeed <= 0 || speedSetting.SpinDuration < 0 || speedSetting.ReelStopInterval < 0 )
+            {
+                throw new Error( '[GameConfig] Reel Speed 設定不合法。' );
+            }
+        }
+
+        if ( normal.SpinSpeed >= turbo.SpinSpeed || turbo.SpinSpeed >= skip.SpinSpeed )
+        {
+            throw new Error( '[GameConfig] Reel Speed 必須符合 Normal < Turbo < Skip。' );
+        }
     }
 
     // 確認每條 Payline 都能正確對應目前的 Slot 盤面

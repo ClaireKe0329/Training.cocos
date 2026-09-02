@@ -4,6 +4,7 @@ import { FSMachine } from '../GameUtility/FSMachine';
 import { GameConfig } from '../GameUtility/GameConfig';
 import { GameUtility } from '../GameUtility/GameUtility';
 import { Reel } from './Reel';
+import { ReelSpeedLevel, IReelSpeedSetting, IReelSpeedSettings } from './ReelSpeed';
 
 const { ccclass, property } = _decorator;
 
@@ -33,8 +34,8 @@ export class ReelController extends Component
     // 管理目前多軸 Reel 的執行狀態
     private _fsMachine: FSMachine<ReelControllerState> = new FSMachine( ReelControllerState.Idle );
 
-    // 本次 Spin 是否已接受玩家的快速停輪要求
-    private _isSkipRequested: boolean = false;
+    // 目前 Spin 使用的 Reel Speed Level
+    private _speedLevel: ReelSpeedLevel = ReelSpeedLevel.Normal;
 
     // 本次 Spin 已經運轉的時間
     private _spinElapsedTime: number = 0;
@@ -51,10 +52,10 @@ export class ReelController extends Component
     // 所有 Reel 停止並完成重設後通知 SlotProcessor
     private _onSpinFinished: ( () => void ) | null = null;
 
-    // Spin 尚未結束且仍可接受 Skip 操作時允許玩家按下 Skip
+    // Spin 尚未結束且尚未進入 Skip Speed 時允許玩家要求 Skip
     public get CanSkipSpin(): boolean
     {
-        if ( this._isSkipRequested )
+        if ( this._speedLevel === ReelSpeedLevel.Skip )
         {
             return false;
         }
@@ -87,7 +88,18 @@ export class ReelController extends Component
         this._fsMachine.Tick( deltaTime );
     }
 
-    // 開始本次 Spin
+    // Spin 開始前設定本局使用的 Normal 或 Turbo Speed
+    public SetSpeedLevel( speedLevel: ReelSpeedLevel ): void
+    {
+        if ( this._fsMachine.CurrentState !== ReelControllerState.Idle || speedLevel === ReelSpeedLevel.Skip )
+        {
+            return;
+        }
+
+        this._speedLevel = speedLevel;
+    }
+
+    // 使用目前設定好的 Speed Level 開始 Spin
     public StartSpin( onSpinFinished: () => void ): void
     {
         if ( !this.CanStartSpin )
@@ -119,16 +131,16 @@ export class ReelController extends Component
             return;
         }
 
-        this._isSkipRequested = true;
+        this.changeSpeedLevel( ReelSpeedLevel.Skip );
 
-        // 尚在等待自動停輪時間時，直接開始停輪
+        // 尚在等待最低 Spin 時間時，直接略過剩餘等待並開始停輪
         if ( this._fsMachine.CurrentState === ReelControllerState.Spinning )
         {
             this._fsMachine.ChangeState( ReelControllerState.Stopping );
             return;
         }
 
-        // 已經開始依序停輪時，直接通知剩下的 Reel 停輪
+        // 已經開始停輪時，立即通知所有剩餘 Reel 進入停輪流程
         this.stopAllPendingReels();
     }
 
@@ -159,7 +171,7 @@ export class ReelController extends Component
     // 回到 Idle 時清除上一輪 Spin 使用的資料
     private enterIdle(): void
     {
-        this._isSkipRequested = false;
+        this._speedLevel = ReelSpeedLevel.Normal;
         this._spinElapsedTime = 0;
         this._stopIntervalElapsedTime = 0;
         this._nextStopReelIndex = 0;
@@ -167,18 +179,20 @@ export class ReelController extends Component
         this._onSpinFinished = null;
     }
 
-    // 進入 Spinning 時讓所有 Reel 同時開始滾動
+    // 進入 Spinning 時讓所有 Reel 使用目前 Speed Level 同時開始滾動
     private enterSpinning(): void
     {
         this._spinElapsedTime = 0;
 
+        const spinSpeed: number = this.getSpeedSetting().SpinSpeed;
+
         for ( const reel of this.Reels )
         {
-            reel.StartSpin();
+            reel.StartSpin( spinSpeed );
         }
     }
 
-    // 等待最低 Spin 時間與盤面結果都準備完成後開始自動停輪
+    // 等待目前 Speed Level 的最低 Spin 時間與盤面結果都準備完成後開始自動停輪
     private updateSpinning( deltaTime: number ): void
     {
         this._spinElapsedTime += deltaTime;
@@ -188,7 +202,7 @@ export class ReelController extends Component
             return;
         }
 
-        if ( this._spinElapsedTime < GameConfig.GetInstance().SpinDuration )
+        if ( this._spinElapsedTime < this.getSpeedSetting().SpinDuration )
         {
             return;
         }
@@ -196,38 +210,39 @@ export class ReelController extends Component
         this._fsMachine.ChangeState( ReelControllerState.Stopping );
     }
 
-    // 進入 Stopping 時開始送出各 Reel 的 StopSpin
+    // 進入 Stopping 時依目前 Speed Level 開始通知各 Reel 停輪
     private enterStopping(): void
     {
         this._nextStopReelIndex = 0;
         this._stopIntervalElapsedTime = 0;
 
-        const reelStopInterval: number = GameConfig.GetInstance().ReelStopInterval;
+        const reelStopInterval: number = this.getSpeedSetting().ReelStopInterval;
 
-        // 快速停輪或沒有停軸間隔時，進入 Stopping 當下就通知所有 Reel 停輪
-        if ( this._isSkipRequested || reelStopInterval === 0 )
+        // 沒有停軸間隔時，同一幀通知所有 Reel 進入停輪流程
+        if ( reelStopInterval === 0 )
         {
             this.stopAllPendingReels();
             return;
         }
 
-        // 自動停輪先立即停止第一軸，後續 Reel 再依 ReelStopInterval 停止
+        // 一般停輪先立即停止第一軸，後續 Reel 再依目前停輪間隔停止
         this.stopNextReel();
     }
 
-    // 依目前停輪方式通知剩餘 Reel，全部送出 StopSpin 後再等待所有 Reel 完整停止
+    // 繼續通知尚未收到 StopSpin 的 Reel，並等待所有 Reel 真正回到 Idle
     private updateStopping( deltaTime: number ): void
     {
-        // 還有 Reel 沒收到 StopSpin 時，繼續處理自動停輪或快速停輪
         if ( this._nextStopReelIndex < this.Reels.length )
         {
-            if ( this._isSkipRequested )
+            const reelStopInterval: number = this.getSpeedSetting().ReelStopInterval;
+
+            if ( reelStopInterval === 0 )
             {
                 this.stopAllPendingReels();
             }
             else
             {
-                this.updateAutoStopSequence( deltaTime );
+                this.updateAutoStopSequence( deltaTime, reelStopInterval );
             }
         }
 
@@ -240,11 +255,9 @@ export class ReelController extends Component
         this._fsMachine.ChangeState( ReelControllerState.Complete );
     }
 
-    // 自動停輪時依 ReelStopInterval 依序通知下一軸停輪
-    private updateAutoStopSequence( deltaTime: number ): void
+    // 依目前 ReelStopInterval 依序通知下一軸停輪
+    private updateAutoStopSequence( deltaTime: number, reelStopInterval: number ): void
     {
-        const reelStopInterval: number = GameConfig.GetInstance().ReelStopInterval;
-
         this._stopIntervalElapsedTime += deltaTime;
 
         // 若這一幀已經經過多個停軸間隔，就把這些時間內應該停下的 Reel 一次處理完
@@ -263,13 +276,47 @@ export class ReelController extends Component
         this._nextStopReelIndex++;
     }
 
-    // 快速停輪時一次通知所有剩餘 Reel 停輪
+    // 同一幀通知所有尚未收到 StopSpin 的 Reel 停輪
     private stopAllPendingReels(): void
     {
         while ( this._nextStopReelIndex < this.Reels.length )
         {
             this.stopNextReel();
         }
+    }
+
+    // Spin 過程中切換 Speed Level，並立即更新仍在運轉中的 Reel
+    private changeSpeedLevel( speedLevel: ReelSpeedLevel ): void
+    {
+        this._speedLevel = speedLevel;
+
+        const spinSpeed: number = this.getSpeedSetting().SpinSpeed;
+
+        for ( const reel of this.Reels )
+        {
+            if ( reel.IsRunning )
+            {
+                reel.SetSpinSpeed( spinSpeed );
+            }
+        }
+    }
+
+    // 取得目前 Speed Level 對應的速度與停輪時間
+    private getSpeedSetting(): IReelSpeedSetting
+    {
+        const reelSpeedSettings: IReelSpeedSettings = GameConfig.GetInstance().ReelSpeedSettings;
+
+        if ( this._speedLevel === ReelSpeedLevel.Turbo )
+        {
+            return reelSpeedSettings.Turbo;
+        }
+
+        if ( this._speedLevel === ReelSpeedLevel.Skip )
+        {
+            return reelSpeedSettings.Skip;
+        }
+
+        return reelSpeedSettings.Normal;
     }
 
     // 本次 Spin 完成後先回到 Idle 重設資料，再通知 SlotProcessor

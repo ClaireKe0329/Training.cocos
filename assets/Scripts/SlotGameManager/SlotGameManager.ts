@@ -1,6 +1,7 @@
 import { _decorator, Component } from 'cc';
 import { SpinResultData } from '../GameData/SpinResultData';
 import { PlayerInfo } from '../Player/PlayerInfo';
+import { ReelSpeedLevel } from '../Reel/ReelSpeed';
 import { SlotProcessor } from './SlotProcessor';
 
 const { ccclass, property } = _decorator;
@@ -16,6 +17,14 @@ export class SlotGameManager extends Component
     // 保存玩家資料；SlotGameManager 只決定各 Round 階段何時修改
     @property( { type: PlayerInfo } )
     public PlayerInfo: PlayerInfo | null = null;
+
+    // 玩家目前選擇的 Reel Speed Level
+    private _reelSpeedLevel: ReelSpeedLevel = ReelSpeedLevel.Normal;
+
+    public get ReelSpeedLevel(): ReelSpeedLevel
+    {
+        return this._reelSpeedLevel;
+    }
 
     // 目前是否正在處理單一 Round
     public get IsRoundRunning(): boolean
@@ -35,7 +44,18 @@ export class SlotGameManager extends Component
         return this.SlotProcessor?.CanSkipRound ?? false;
     }
 
-    // 啟動單一 Round
+    // 切換 Normal / Turbo Mode
+    public ToggleTurbo(): void
+    {
+        if ( this.IsRoundRunning )
+        {
+            return;
+        }
+
+        this._reelSpeedLevel = this._reelSpeedLevel === ReelSpeedLevel.Normal ? ReelSpeedLevel.Turbo : ReelSpeedLevel.Normal;
+    }
+
+    // 根據目前選擇的 Reel Speed Level 啟動單一 Round
     public StartRound(): void
     {
         if ( !this.SlotProcessor || !this.PlayerInfo || !this.CanStartRound )
@@ -44,7 +64,7 @@ export class SlotGameManager extends Component
         }
 
         const roundBet: number = this.PlayerInfo.Bet;
-        this.SlotProcessor.StartRound( roundBet, this.onRewardStarted.bind( this ), this.completeRound.bind( this ) );
+        this.SlotProcessor.StartRound( roundBet, this._reelSpeedLevel, this.onRewardStarted.bind( this ), this.completeRound.bind( this ) );
 
         // Round 成功進入 Spinning 後才清除上一局 Win 並扣除本局 Bet
         this.PlayerInfo.ResetWin();

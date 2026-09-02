@@ -4,6 +4,7 @@ import { SpinResultData } from '../GameData/SpinResultData';
 import { SymbolType } from '../GameData/SymbolType';
 import { FSMachine } from '../GameUtility/FSMachine';
 import { ReelController } from '../Reel/ReelController';
+import { ReelSpeedLevel } from '../Reel/ReelSpeed';
 import { RewardShowProcessor } from '../RewardShow/RewardShowProcessor';
 import { ISpinResultProvider, LocalSpinResultProvider } from './LocalSpinResultProvider';
 
@@ -45,6 +46,9 @@ export class SlotProcessor extends Component
     // 保存目前 Round 使用的 Bet
     private _roundBet: number = 0;
 
+    // 保存目前 Round 使用的初始 Reel Speed Level
+    private _reelSpeedLevel: ReelSpeedLevel = ReelSpeedLevel.Normal;
+
     // 管理目前單一 Round 所在的流程階段
     private _fsMachine: FSMachine<SlotProcessorState> = new FSMachine( SlotProcessorState.Idle );
 
@@ -83,8 +87,13 @@ export class SlotProcessor extends Component
         this.initFSM();
     }
 
-    // 啟動單一 Round，並保存 Reward Started 與 Round Finished 的一對一通知
-    public StartRound( bet: number, onRewardStarted: ( spinResult: SpinResultData ) => void, onRoundFinished: ( spinResult: SpinResultData | null ) => void ): void
+    // 啟動單一 Round，並保存本局 Reel Speed 與完成通知
+    public StartRound(
+        bet: number,
+        reelSpeedLevel: ReelSpeedLevel,
+        onRewardStarted: ( spinResult: SpinResultData ) => void,
+        onRoundFinished: ( spinResult: SpinResultData | null ) => void
+    ): void
     {
         if ( !this.CanStartRound )
         {
@@ -92,6 +101,7 @@ export class SlotProcessor extends Component
         }
 
         this._roundBet = bet;
+        this._reelSpeedLevel = reelSpeedLevel;
         this._onRewardStarted = onRewardStarted;
         this._onRoundFinished = onRoundFinished;
 
@@ -131,18 +141,20 @@ export class SlotProcessor extends Component
         this._fsMachine.Start();
     }
 
-    // 進入 Idle 時清除上一局 lifecycle data 與 callbacks，準備接受下一個 Round
+    // 進入 Idle 時清除上一局資料與 callbacks，準備接受下一個 Round
     private enterIdle(): void
     {
         this._spinResult = null;
         this._roundBet = 0;
+        this._reelSpeedLevel = ReelSpeedLevel.Normal;
         this._onRewardStarted = null;
         this._onRoundFinished = null;
     }
 
-    // 進入 Spinning 時啟動 Reel，並取得本局完整 Spin Result
+    // 進入 Spinning 時先設定本局 Reel Speed，再啟動 Reel Flow 並取得 Result
     private enterSpinning(): void
     {
+        this.ReelController.SetSpeedLevel( this._reelSpeedLevel );
         this.ReelController.StartSpin( this.onReelSpinFinished.bind( this ) );
 
         const spinResult: SpinResultData | null = this._spinResultProvider.GetSpinResult( this._roundBet );
@@ -214,7 +226,7 @@ export class SlotProcessor extends Component
             console.log( '[SlotProcessor] 本局得分', spinResult.TotalScore );
         }
 
-        // Round 已 Complete，接著進入 Idle Reset lifecycle data
+        // Round 已 Complete，接著回到 Idle Reset 上一局資料
         this._fsMachine.ChangeState( SlotProcessorState.Idle );
 
         // Reset 完成後才通知上層，callback 執行時已可安全開始下一局

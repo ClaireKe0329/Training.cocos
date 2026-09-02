@@ -1,9 +1,23 @@
 {
-    "SpinSpeed": 900,
     "ShockDistance": 18,
     "ShockDuration": 0.12,
-    "ReelStopInterval": 0.15,
-    "SpinDuration": 2,
+    "ReelSpeedSettings": {
+        "Normal": {
+            "SpinSpeed": 900,
+            "SpinDuration": 2,
+            "ReelStopInterval": 0.15
+        },
+        "Turbo": {
+            "SpinSpeed": 1350,
+            "SpinDuration": 1,
+            "ReelStopInterval": 0
+        },
+        "Skip": {
+            "SpinSpeed": 1800,
+            "SpinDuration": 0,
+            "ReelStopInterval": 0
+        }
+    },
     "InitialBalance": 10000,
     "InitialBet": 100,
     "RewardShowDuration": 1,
