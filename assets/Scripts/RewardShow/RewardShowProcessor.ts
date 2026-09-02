@@ -1,5 +1,6 @@
 import { _decorator, Component } from 'cc';
 import { SpinResultData } from '../GameData/SpinResultData';
+import { FSMachine } from '../GameUtility/FSMachine';
 import { GameConfig } from '../GameUtility/GameConfig';
 import { ReelController } from '../Reel/ReelController';
 
@@ -12,6 +13,18 @@ interface IRewardEffectTarget
     RowIndex: number;
 }
 
+enum RewardShowProcessorState
+{
+    // 沒有正在播放 Reward，可以接受下一次 ShowReward
+    Idle,
+
+    // 正在播放本次 Reward
+    Showing,
+
+    // 本次 Reward 已播放完成，準備回到 Idle
+    Complete,
+}
+
 // 根據既有 Spin Result 控制中獎表現，不重新判斷中獎或計算分數
 @ccclass( 'RewardShowProcessor' )
 export class RewardShowProcessor extends Component
@@ -20,19 +33,28 @@ export class RewardShowProcessor extends Component
     @property( { type: ReelController } )
     public ReelController: ReelController | null = null;
 
-    // 目前是否正在播放 Reward
-    private _isShowingReward: boolean = false;
+    // 管理目前 Reward 的播放狀態
+    private _fsMachine: FSMachine<RewardShowProcessorState> = new FSMachine( RewardShowProcessorState.Idle );
 
-    // Reward 完成並 Reset 後通知 SlotProcessor
+    // 本次 Reward 實際需要播放的盤面位置
+    private _rewardEffectTargets: IRewardEffectTarget[] = [];
+
+    // Reward 完成並回到 Idle 後通知 SlotProcessor
     private _onRewardFinished: ( () => void ) | null = null;
 
-    // 沒有正在播放的 Reward，且 ReelController 已設定時才能開始
+    // 沒有正在播放 Reward，且 ReelController 已設定時才能開始
     public get CanShowReward(): boolean
     {
-        return !this._isShowingReward && this.ReelController !== null;
+        return this._fsMachine.CurrentState === RewardShowProcessorState.Idle
+            && this.ReelController !== null;
     }
 
-    // 依 Spin Result 的中獎位置播放 Win 表現
+    protected onLoad(): void
+    {
+        this.initFSM();
+    }
+
+    // 保存本次 Reward 要播放的位置後進入 Showing
     public ShowReward( spinResult: SpinResultData, onRewardFinished: () => void ): void
     {
         if ( !this.CanShowReward )
@@ -40,27 +62,75 @@ export class RewardShowProcessor extends Component
             return;
         }
 
-        this._isShowingReward = true;
+        this._rewardEffectTargets = this.getRewardEffectTargets( spinResult );
         this._onRewardFinished = onRewardFinished;
 
-        // LineResult 可能包含相同的中獎位置，先整理出實際需要播放的 Slot 位置
-        const rewardEffectTargets: IRewardEffectTarget[] = this.getRewardEffectTargets( spinResult );
+        this._fsMachine.ChangeState( RewardShowProcessorState.Showing );
+    }
 
+    private initFSM(): void
+    {
+        this._fsMachine.RegisterStateEvent( RewardShowProcessorState.Idle, {
+            OnEnter: this.enterIdle.bind( this ),
+        } );
+
+        this._fsMachine.RegisterStateEvent( RewardShowProcessorState.Showing, {
+            OnEnter: this.enterShowing.bind( this ),
+        } );
+
+        this._fsMachine.RegisterStateEvent( RewardShowProcessorState.Complete, {
+            OnEnter: this.enterComplete.bind( this ),
+        } );
+
+        this._fsMachine.Start();
+    }
+
+    // 回到 Idle 時清除上一輪 Reward 使用的資料與排程
+    private enterIdle(): void
+    {
+        this.unscheduleAllCallbacks();
+        this._rewardEffectTargets = [];
+        this._onRewardFinished = null;
+    }
+
+    // 進入 Showing 時開始播放本次 Reward
+    private enterShowing(): void
+    {
         // 沒有中獎位置時不需要等待 Reward 表演，直接完成
-        if ( rewardEffectTargets.length === 0 )
+        if ( this._rewardEffectTargets.length === 0 )
         {
-            this.completeReward();
+            this._fsMachine.ChangeState( RewardShowProcessorState.Complete );
             return;
         }
 
         // 每個 SlotUnit 都有自己的 WinEffect，因此所有中獎位置可以同時播放
-        for ( const rewardTarget of rewardEffectTargets )
+        for ( const rewardTarget of this._rewardEffectTargets )
         {
             this.ReelController.PlayWin( rewardTarget.ReelIndex, rewardTarget.RowIndex );
         }
 
-        // WinEffect 播放後保留固定顯示時間，再完成本次 Reward
         this.scheduleOnce( this.completeReward, GameConfig.GetInstance().RewardShowDuration );
+    }
+
+    // Reward 表演時間結束後進入 Complete
+    private completeReward(): void
+    {
+        if ( this._fsMachine.CurrentState !== RewardShowProcessorState.Showing )
+        {
+            return;
+        }
+
+        this._fsMachine.ChangeState( RewardShowProcessorState.Complete );
+    }
+
+    // Reward Complete 後回到 Idle 清除資料，再通知 SlotProcessor
+    private enterComplete(): void
+    {
+        const onRewardFinished: ( () => void ) | null = this._onRewardFinished;
+
+        this._fsMachine.ChangeState( RewardShowProcessorState.Idle );
+
+        onRewardFinished?.();
     }
 
     // 根據 LineResult 整理本輪不重複的中獎位置
@@ -90,28 +160,5 @@ export class RewardShowProcessor extends Component
         }
 
         return rewardEffectTargets;
-    }
-
-    // 完成本次 Reward，再 Reset 並通知 SlotProcessor
-    private completeReward(): void
-    {
-        if ( !this._isShowingReward )
-        {
-            return;
-        }
-
-        const onRewardFinished: ( () => void ) | null = this._onRewardFinished;
-
-        this.resetReward();
-
-        onRewardFinished?.();
-    }
-
-    // 清除本次 Reward 使用的狀態與排程
-    private resetReward(): void
-    {
-        this.unscheduleAllCallbacks();
-        this._isShowingReward = false;
-        this._onRewardFinished = null;
     }
 }
