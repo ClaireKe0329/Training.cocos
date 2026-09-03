@@ -21,6 +21,19 @@
     "InitialBalance": 10000,
     "InitialBet": 100,
     "RewardShowDuration": 1,
+    "AutoSpinSettings": {
+        "SelectionOptions": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            750,
+            1000,
+            9999
+        ],
+        "InfiniteCount": 9999
+    },
     "Paylines": [
         [
             1,

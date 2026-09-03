@@ -3281,7 +3281,7 @@
     "propertyPath": [
       "_name"
     ],
-    "value": "SelectionPanel"
+    "value": "AutoSelectionPanel"
   },
   {
     "__type__": "cc.TargetInfo",
@@ -3399,7 +3399,7 @@
     "AutoButtonInfiniteIcon": {
       "__id__": 48
     },
-    "SelectionPanel": null,
+    "AutoSelectionPanel": null,
     "BalanceLabel": {
       "__id__": 95
     },
@@ -3445,7 +3445,7 @@
     },
     "sourceInfo": null,
     "propertyPath": [
-      "SelectionPanel"
+      "AutoSelectionPanel"
     ],
     "target": {
       "__id__": 126

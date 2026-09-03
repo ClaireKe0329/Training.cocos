@@ -1,13 +1,11 @@
 import { _decorator, Component } from 'cc';
 import { SpinResultData } from '../GameData/SpinResultData';
+import { GameConfig } from '../GameUtility/GameConfig';
 import { PlayerInfo } from '../Player/PlayerInfo';
 import { ReelSpeedLevel } from '../Reel/ReelSpeed';
 import { SlotProcessor } from './SlotProcessor';
 
 const { ccclass, property } = _decorator;
-
-// Infinite Auto 的資料約定值；只有 Auto domain 與顯示 Auto 狀態的 UI 需要知道此語意
-export const AUTO_SPIN_INFINITE_COUNT: number = 9999;
 
 // 提供整台 Slot 的公開操作入口，並負責 Game-Level Operation Mode、Round Settlement 與 Auto Flow
 @ccclass( 'SlotGameManager' )
@@ -42,7 +40,7 @@ export class SlotGameManager extends Component
         return this._reelSpeedLevel === ReelSpeedLevel.Turbo;
     }
 
-    // 提供目前 Auto 設定 / 剩餘局數；Infinite 的特殊值由 Auto domain 解讀
+    // 提供目前 Auto 設定 / 剩餘局數；Infinite sentinel 由 GameConfig 提供
     public get AutoSpinCount(): number
     {
         return this._autoSpinCount;
@@ -145,7 +143,7 @@ export class SlotGameManager extends Component
         this.StartRound();
 
         // Infinite 保持 sentinel 不遞減；有限 Auto 在每局成功開始後才扣除一次
-        if ( this._autoSpinCount !== AUTO_SPIN_INFINITE_COUNT )
+        if ( this._autoSpinCount !== GameConfig.GetInstance().AutoSpinInfiniteCount )
         {
             this._autoSpinCount--;
         }

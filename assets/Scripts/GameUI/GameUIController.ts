@@ -1,20 +1,11 @@
 import { _decorator, Button, Component, Label, Node } from 'cc';
-import { AUTO_SPIN_INFINITE_COUNT, SlotGameManager } from '../SlotGameManager/SlotGameManager';
+import { GameConfig } from '../GameUtility/GameConfig';
+import { SlotGameManager } from '../SlotGameManager/SlotGameManager';
 import { PlayerInfo } from '../Player/PlayerInfo';
 import { ISelectionOption } from './SelectionOption';
 import { SelectionPanel } from './SelectionPanel';
 
 const { ccclass, property } = _decorator;
-
-// Auto 選擇 Panel 的固定 View 設定；選項內容目前由 UI 層提供，之後若改為 Config 再調整資料來源
-const AUTO_SELECTION_TITLE: string = '自動旋轉';
-const AUTO_SELECTION_COLUMN_COUNT: number = 4;
-
-// Label 只負責玩家看到的文字，Value 才是 SelectionPanel 回傳給 Auto Flow 的實際資料
-const AUTO_SELECTION_OPTIONS: ISelectionOption[] = [
-    { Label: '10', Value: 10 }, { Label: '50', Value: 50 }, { Label: '100', Value: 100 }, { Label: '250', Value: 250 },
-    { Label: '500', Value: 500 }, { Label: '750', Value: 750 }, { Label: '1000', Value: 1000 }, { Label: '∞', Value: AUTO_SPIN_INFINITE_COUNT },
-];
 
 // 負責玩家操作與 UI 顯示；Game Logic 操作交給 SlotGameManager，玩家資料只從 PlayerInfo 讀取
 @ccclass( 'GameUIController' )
@@ -48,9 +39,9 @@ export class GameUIController extends Component
     @property( { type: Node } )
     public AutoButtonInfiniteIcon: Node | null = null;
 
-    // Auto 與之後 Bet 共用的選擇型 View；Panel 本身不知道選項實際代表的 Game Data
+    // Auto 專用的 SelectionPanel instance；未來 Bet 使用同一 Prefab 建立另一份 instance
     @property( { type: SelectionPanel } )
-    public SelectionPanel: SelectionPanel | null = null;
+    public AutoSelectionPanel: SelectionPanel | null = null;
 
     @property( { type: Label } )
     public BalanceLabel: Label | null = null;
@@ -79,7 +70,7 @@ export class GameUIController extends Component
     private _lastBet: number | null = null;
     private _lastWin: number | null = null;
 
-    // Auto SelectionPanel 的內容在用途不變時只建立一次；之後 Show 只同步目前 Selection
+    // Auto Panel 的 Option Nodes 在用途不變時只建立一次；Title、Grid 欄數與 allowSwitchOff 由 Prefab instance 決定
     protected start(): void
     {
         this.configureAutoSelectionPanel();
@@ -126,16 +117,22 @@ export class GameUIController extends Component
         this._lastWin = null;
     }
 
-    // Auto 是 SelectionPanel 的第一個 consumer；Panel 只取得顯示資料與 selection callback，不知道 Auto 規則
+    // Auto 可選局數由 GameConfig 提供；GameUIController 只把 numeric value 轉成 SelectionPanel 顯示資料
     private configureAutoSelectionPanel(): void
     {
-        if ( !this.SelectionPanel )
+        if ( !this.AutoSelectionPanel )
         {
             return;
         }
 
-        // Auto 允許再次點擊目前 Toggle 取消設定；未來 Bet 可沿用同一 Panel 但使用不同規則
-        this.SelectionPanel.Configure( AUTO_SELECTION_TITLE, AUTO_SELECTION_OPTIONS, AUTO_SELECTION_COLUMN_COUNT, true, this.onAutoSpinCountChanged.bind( this ) );
+        const gameConfig: GameConfig = GameConfig.GetInstance();
+        const infiniteCount: number = gameConfig.AutoSpinInfiniteCount;
+        const selectionOptions: ISelectionOption[] = gameConfig.AutoSpinSelectionOptions.map( ( optionValue: number ): ISelectionOption => ( {
+            Label: optionValue === infiniteCount ? '∞' : `${optionValue}`,
+            Value: optionValue,
+        } ) );
+
+        this.AutoSelectionPanel.Configure( selectionOptions, this.onAutoSpinCountChanged.bind( this ) );
     }
 
     // 玩家按 Spin 時，沒有 Auto 設定就啟動單一 Round；已有 Auto 設定則正式進入 Auto Flow
@@ -178,7 +175,7 @@ export class GameUIController extends Component
         this.updateButtonState();
     }
 
-    // Auto 執行中再次點擊只取消後續局；尚未執行時才開啟 Panel 調整局數
+    // Auto 執行中再次點擊只取消後續局；尚未執行時才開啟 AutoSelectionPanel 調整局數
     private onAutoButtonClick(): void
     {
         if ( !this.SlotGameManager )
@@ -193,14 +190,14 @@ export class GameUIController extends Component
             return;
         }
 
-        if ( !this.SelectionPanel )
+        if ( !this.AutoSelectionPanel )
         {
             return;
         }
 
         // Panel 每次開啟都以 Manager 的最新設定同步 Toggle，不依賴上次關閉時留下的 View State
         const autoSpinCount: number = this.SlotGameManager.AutoSpinCount;
-        this.SelectionPanel.Show( autoSpinCount > 0 ? autoSpinCount : null );
+        this.AutoSelectionPanel.Show( autoSpinCount > 0 ? autoSpinCount : null );
     }
 
     // SelectionPanel 的 null 只代表目前沒有 UI Selection；Auto domain 使用 0 表達尚未設定
@@ -308,9 +305,9 @@ export class GameUIController extends Component
             return;
         }
 
-        const isInfinite: boolean = autoSpinCount === AUTO_SPIN_INFINITE_COUNT;
+        const isInfinite: boolean = autoSpinCount === GameConfig.GetInstance().AutoSpinInfiniteCount;
 
-        // Infinite 使用獨立 Icon 呈現，不讓內部約定值 9999 洩漏到玩家畫面
+        // Infinite 使用獨立 Icon 呈現，不讓 Config sentinel 洩漏到玩家畫面
         if ( isInfinite )
         {
             this.AutoButtonLabel.string = '';
@@ -320,10 +317,8 @@ export class GameUIController extends Component
             return;
         }
 
-        const selectedOption: ISelectionOption | undefined = AUTO_SELECTION_OPTIONS.find( option => option.Value === autoSpinCount );
-
-        // Auto 執行中的 49、48...不在預設選項內，因此找不到 Label 時直接顯示剩餘局數
-        this.AutoButtonLabel.string = selectedOption?.Label ?? `${autoSpinCount}`;
+        // Auto 執行中的 49、48...直接顯示 Manager 的剩餘 Count，不依賴原始 SelectionOptions
+        this.AutoButtonLabel.string = `${autoSpinCount}`;
         this.AutoButtonLabel.node.active = true;
         this.AutoButtonInfiniteIcon.active = false;
         this.AutoButtonCoverBackground.active = true;

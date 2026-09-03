@@ -7,7 +7,7 @@ const { ccclass, property } = _decorator;
 @ccclass( 'SelectionPanel' )
 export class SelectionPanel extends Component
 {
-    // Panel 標題由使用者在 Configure 時決定，因此同一個 Panel 可以服務不同選擇用途
+    // Title 內容由各自的 Prefab instance 在 Inspector 設定，不在 Runtime 依用途切換
     @property( { type: Label } )
     public TitleLabel: Label | null = null;
 
@@ -15,11 +15,11 @@ export class SelectionPanel extends Component
     @property( { type: Node } )
     public OptionContainer: Node | null = null;
 
-    // 負責同一組 Toggle 的單選關係；是否允許全部取消由使用此 Panel 的功能決定
+    // 負責同一組 Toggle 的單選關係；allowSwitchOff 由各自的 Prefab instance 在 Inspector 設定
     @property( { type: ToggleContainer } )
     public ToggleGroup: ToggleContainer | null = null;
 
-    // Layout 的 Grid / Constraint 類型由 Prefab 保證，Runtime 只依不同用途調整欄數
+    // Grid 型式與欄數由各自的 Prefab instance 決定；Runtime 只在建立 Options 後要求重新排版
     @property( { type: Layout } )
     public OptionLayout: Layout | null = null;
 
@@ -36,18 +36,15 @@ export class SelectionPanel extends Component
     // 將目前整組 Selection 回傳給外部；null 只代表此 Panel 現在沒有任何選項被選中
     private _onSelectionChanged: ( ( selectedValue: number | null ) => void ) | null = null;
 
-    // 只有選項內容或使用規則改變時才重新建立 Options；單純開關 Panel 不應重建內容
-    public Configure( title: string, options: ISelectionOption[], columnCount: number, allowSwitchOff: boolean, onSelectionChanged: ( selectedValue: number | null ) => void ): void
+    // 只有選項內容改變時才重新建立 Options；Title、Grid 與 Toggle 規則由各自的 Prefab instance 決定
+    public Configure( options: ISelectionOption[], onSelectionChanged: ( selectedValue: number | null ) => void ): void
     {
-        if ( !this.TitleLabel || !this.OptionContainer || !this.ToggleGroup || !this.OptionLayout || !this.SelectionOptionPrefab )
+        if ( !this.OptionContainer || !this.ToggleGroup || !this.OptionLayout || !this.SelectionOptionPrefab )
         {
             return;
         }
 
         this._onSelectionChanged = onSelectionChanged;
-        this.TitleLabel.string = title;
-        this.ToggleGroup.allowSwitchOff = allowSwitchOff;
-        this.OptionLayout.constraintNum = columnCount;
 
         // Configure 代表這組內容已變更，因此先清除上一組 Options 再建立新的 View
         this.clearOptions();
@@ -63,7 +60,7 @@ export class SelectionPanel extends Component
                 continue;
             }
 
-            // 先完成 Option 資料設定，再加入啟用中的 Container，避免初始化時產生沒有必要的 Selection Event
+            // 先完成 Option 資料設定，再加入 Container，讓啟用時已具有完整顯示資料與 callback
             selectionOption.Configure( option, this.onOptionChanged.bind( this ) );
 
             this.OptionContainer.addChild( optionNode );
@@ -122,7 +119,7 @@ export class SelectionPanel extends Component
         }
     }
 
-    // Configure 換用途時才銷毀上一組 Options；Show / Hide 不影響已建立的選項內容
+    // Configure 換內容時才銷毀上一組 Options；Show / Hide 不影響已建立的選項內容
     private clearOptions(): void
     {
         for ( const selectionOption of this._selectionOptions )
