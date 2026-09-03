@@ -1,5 +1,5 @@
 import { _decorator, Button, Component, Label, Node } from 'cc';
-import { SlotGameManager } from '../SlotGameManager/SlotGameManager';
+import { AUTO_SPIN_INFINITE_COUNT, SlotGameManager } from '../SlotGameManager/SlotGameManager';
 import { PlayerInfo } from '../Player/PlayerInfo';
 import { ISelectionOption } from './SelectionOption';
 import { SelectionPanel } from './SelectionPanel';
@@ -10,16 +10,13 @@ const { ccclass, property } = _decorator;
 const AUTO_SELECTION_TITLE: string = '自動旋轉';
 const AUTO_SELECTION_COLUMN_COUNT: number = 4;
 
-// 9999 是目前 Auto Infinite 的資料約定值；SelectionPanel 仍只把它當成一般 number
-const AUTO_SPIN_INFINITE_COUNT: number = 9999;
-
 // Label 只負責玩家看到的文字，Value 才是 SelectionPanel 回傳給 Auto Flow 的實際資料
 const AUTO_SELECTION_OPTIONS: ISelectionOption[] = [
     { Label: '10', Value: 10 }, { Label: '50', Value: 50 }, { Label: '100', Value: 100 }, { Label: '250', Value: 250 },
     { Label: '500', Value: 500 }, { Label: '750', Value: 750 }, { Label: '1000', Value: 1000 }, { Label: '∞', Value: AUTO_SPIN_INFINITE_COUNT },
 ];
 
-// 負責玩家操作與 UI 顯示；Round 操作交給 SlotGameManager，玩家資料只從 PlayerInfo 讀取
+// 負責玩家操作與 UI 顯示；Game Logic 操作交給 SlotGameManager，玩家資料只從 PlayerInfo 讀取
 @ccclass( 'GameUIController' )
 export class GameUIController extends Component
 {
@@ -35,11 +32,11 @@ export class GameUIController extends Component
     @property( { type: Button } )
     public TurboOnButton: Button | null = null;
 
-    // Auto 主操作按鈕；目前未執行 Auto 時用來開啟局數選擇 Panel
+    // Auto 主操作按鈕；未執行 Auto 時開啟局數選擇 Panel，Auto 執行中再次點擊則取消後續 Auto
     @property( { type: Button } )
     public AutoButton: Button | null = null;
 
-    // 有限局數顯示；Infinite 使用獨立 Icon，不直接把 9999 顯示給玩家
+    // 有限 Auto 顯示目前設定 / 剩餘局數；Infinite 使用獨立 Icon
     @property( { type: Label } )
     public AutoButtonLabel: Label | null = null;
 
@@ -51,7 +48,7 @@ export class GameUIController extends Component
     @property( { type: Node } )
     public AutoButtonInfiniteIcon: Node | null = null;
 
-    // Auto 與之後的 Bet 共用同一種選擇型 View，Panel 本身不知道選項代表的 Game Data
+    // Auto 與之後 Bet 共用的選擇型 View；Panel 本身不知道選項實際代表的 Game Data
     @property( { type: SelectionPanel } )
     public SelectionPanel: SelectionPanel | null = null;
 
@@ -64,7 +61,7 @@ export class GameUIController extends Component
     @property( { type: Label } )
     public WinLabel: Label | null = null;
 
-    // 提供 Round 狀態與操作入口的 SlotGameManager
+    // 提供 Round、Turbo、Auto 等 Game-Level 操作與公開狀態
     @property( { type: SlotGameManager } )
     public SlotGameManager: SlotGameManager | null = null;
 
@@ -82,7 +79,7 @@ export class GameUIController extends Component
     private _lastBet: number | null = null;
     private _lastWin: number | null = null;
 
-    // SelectionPanel 的內容在用途不變時只建立一次；之後開啟只同步目前 Selection
+    // Auto SelectionPanel 的內容在用途不變時只建立一次；之後 Show 只同步目前 Selection
     protected start(): void
     {
         this.configureAutoSelectionPanel();
@@ -129,7 +126,7 @@ export class GameUIController extends Component
         this._lastWin = null;
     }
 
-    // Auto 是 SelectionPanel 的第一個使用者；Panel 只取得顯示資料與 selection callback，不知道 Auto 規則
+    // Auto 是 SelectionPanel 的第一個 consumer；Panel 只取得顯示資料與 selection callback，不知道 Auto 規則
     private configureAutoSelectionPanel(): void
     {
         if ( !this.SelectionPanel )
@@ -137,15 +134,21 @@ export class GameUIController extends Component
             return;
         }
 
-        // Auto 允許再次點擊目前 Toggle 取消設定；Bet 未來可使用同一個 Panel 但採不同規則
+        // Auto 允許再次點擊目前 Toggle 取消設定；未來 Bet 可沿用同一 Panel 但使用不同規則
         this.SelectionPanel.Configure( AUTO_SELECTION_TITLE, AUTO_SELECTION_OPTIONS, AUTO_SELECTION_COLUMN_COUNT, true, this.onAutoSpinCountChanged.bind( this ) );
     }
 
-    // 將玩家的 Spin 操作交給 SlotGameManager 啟動 Round
+    // 玩家按 Spin 時，沒有 Auto 設定就啟動單一 Round；已有 Auto 設定則正式進入 Auto Flow
     private onSpinButtonClick(): void
     {
         if ( !this.SlotGameManager )
         {
+            return;
+        }
+
+        if ( this.SlotGameManager.AutoSpinCount > 0 )
+        {
+            this.SlotGameManager.StartAuto();
             return;
         }
 
@@ -163,7 +166,7 @@ export class GameUIController extends Component
         this.SlotGameManager.SkipRound();
     }
 
-    // 將玩家的 Turbo 切換操作交給 SlotGameManager
+    // Turbo 設定只影響下一個 Round；目前已開始的 Round 使用自己的 Speed snapshot，不會中途改速
     private onTurboButtonClick(): void
     {
         if ( !this.SlotGameManager )
@@ -175,14 +178,27 @@ export class GameUIController extends Component
         this.updateButtonState();
     }
 
-    // Panel 每次開啟都以 Manager 的最新 Auto 設定同步 Toggle，不依賴上一次關閉時留下的 View State
+    // Auto 執行中再次點擊只取消後續局；尚未執行時才開啟 Panel 調整局數
     private onAutoButtonClick(): void
     {
-        if ( !this.SlotGameManager || !this.SelectionPanel )
+        if ( !this.SlotGameManager )
         {
             return;
         }
 
+        if ( this.SlotGameManager.IsAutoRunning )
+        {
+            this.SlotGameManager.StopAuto();
+            this.updateAutoSpinView();
+            return;
+        }
+
+        if ( !this.SelectionPanel )
+        {
+            return;
+        }
+
+        // Panel 每次開啟都以 Manager 的最新設定同步 Toggle，不依賴上次關閉時留下的 View State
         const autoSpinCount: number = this.SlotGameManager.AutoSpinCount;
         this.SelectionPanel.Show( autoSpinCount > 0 ? autoSpinCount : null );
     }
@@ -199,7 +215,7 @@ export class GameUIController extends Component
         this.updateAutoSpinView();
     }
 
-    // 依照目前 Round、Skip 與 Turbo 狀態更新按鈕顯示
+    // 依目前 Round、Skip 與 Turbo 狀態同步按鈕顯示
     private updateButtonState(): void
     {
         if ( !this.SlotGameManager || !this.SpinButton || !this.StopButton || !this.TurboOffButton || !this.TurboOnButton )
@@ -225,11 +241,9 @@ export class GameUIController extends Component
         this.StopButton.node.active = isRoundRunning;
         this.StopButton.interactable = canSkipRound;
 
-        // Turbo 是 Round 之間選擇的 Operation Mode，不在進行中的 Round 改變速度模式
+        // Turbo Button 永遠可以切換；Round 中修改的是下一局設定，不會改變目前 Round 已保存的 Speed
         this.TurboOffButton.node.active = !isTurbo;
         this.TurboOnButton.node.active = isTurbo;
-        this.TurboOffButton.interactable = !isRoundRunning;
-        this.TurboOnButton.interactable = !isRoundRunning;
     }
 
     // Balance、Bet、Win 的 owner 是 PlayerInfo；UI 只將最新資料呈現在 Label
@@ -263,7 +277,7 @@ export class GameUIController extends Component
         }
     }
 
-    // Auto Button 依 Auto 設定與執行狀態呈現局數、Infinite Icon 或預設樣式
+    // Auto Button 依 Auto 設定與執行狀態呈現有限局數、Infinite Icon 或預設樣式
     private updateAutoSpinView(): void
     {
         if ( !this.SlotGameManager || !this.AutoButtonLabel || !this.AutoButtonCoverBackground || !this.AutoButtonInfiniteIcon )
@@ -282,7 +296,7 @@ export class GameUIController extends Component
         this._lastAutoSpinCount = autoSpinCount;
         this._lastIsAutoRunning = isAutoRunning;
 
-        // 最後一局開始後 Count 已經是 0，但 Auto 仍在執行；必須等該 Round 完整結束後才能恢復預設 Button
+        // 最後一局開始後 Count 已是 0，但 Auto 仍在執行；必須等該 Round 完整結束後才能恢復預設 Button
         const hasAutoSetting: boolean = autoSpinCount > 0 || isAutoRunning;
 
         if ( !hasAutoSetting )
