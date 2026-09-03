@@ -21,10 +21,25 @@ export class SlotGameManager extends Component
     // 玩家目前選擇的 Reel Speed Level；Round 進行中不允許切換
     private _reelSpeedLevel: ReelSpeedLevel = ReelSpeedLevel.Normal;
 
+    // 只保存玩家設定的 Auto Spin 局數；0 代表尚未設定，目前還不啟動 Auto Flow
+    private _autoSpinCount: number = 0;
+
+    private _isAutoRunning: boolean = false;
+
+    public get IsAutoRunning(): boolean
+    {
+        return this._isAutoRunning;
+    }
+
     // UI 只需要知道 Turbo 是否啟用，不直接依賴 Reel Speed 的完整類型
     public get IsTurbo(): boolean
     {
         return this._reelSpeedLevel === ReelSpeedLevel.Turbo;
+    }
+
+    public get AutoSpinCount(): number
+    {
+        return this._autoSpinCount;
     }
 
     // 目前是否正在處理單一 Round
@@ -54,6 +69,12 @@ export class SlotGameManager extends Component
         }
 
         this._reelSpeedLevel = this._reelSpeedLevel === ReelSpeedLevel.Normal ? ReelSpeedLevel.Turbo : ReelSpeedLevel.Normal;
+    }
+
+    // 只修改 Auto 局數設定；真正的 Start / Stop / Count Timing 留給 Auto Flow 負責
+    public SetAutoSpinCount( autoSpinCount: number ): void
+    {
+        this._autoSpinCount = autoSpinCount;
     }
 
     // 根據目前選擇的 Reel Speed Level 啟動單一 Round
