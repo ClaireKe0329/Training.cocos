@@ -6,10 +6,14 @@ import { SelectionPanel } from './SelectionPanel';
 
 const { ccclass, property } = _decorator;
 
+// Auto 選擇 Panel 的固定 View 設定；選項內容目前由 UI 層提供，之後若改為 Config 再調整資料來源
 const AUTO_SELECTION_TITLE: string = '自動旋轉';
 const AUTO_SELECTION_COLUMN_COUNT: number = 4;
+
+// 9999 是目前 Auto Infinite 的資料約定值；SelectionPanel 仍只把它當成一般 number
 const AUTO_SPIN_INFINITE_COUNT: number = 9999;
 
+// Label 只負責玩家看到的文字，Value 才是 SelectionPanel 回傳給 Auto Flow 的實際資料
 const AUTO_SELECTION_OPTIONS: ISelectionOption[] = [
     { Label: '10', Value: 10 }, { Label: '50', Value: 50 }, { Label: '100', Value: 100 }, { Label: '250', Value: 250 },
     { Label: '500', Value: 500 }, { Label: '750', Value: 750 }, { Label: '1000', Value: 1000 }, { Label: '∞', Value: AUTO_SPIN_INFINITE_COUNT },
@@ -31,15 +35,19 @@ export class GameUIController extends Component
     @property( { type: Button } )
     public TurboOnButton: Button | null = null;
 
+    // Auto 主操作按鈕；目前未執行 Auto 時用來開啟局數選擇 Panel
     @property( { type: Button } )
     public AutoButton: Button | null = null;
 
+    // 有限局數顯示；Infinite 使用獨立 Icon，不直接把 9999 顯示給玩家
     @property( { type: Label } )
     public AutoButtonLabel: Label | null = null;
 
+    // Auto 已設定或執行中時覆蓋原本 Auto Button 樣式
     @property( { type: Node } )
     public AutoButtonCoverBackground: Node | null = null;
 
+    // Infinite Auto 專用顯示；有限局數時保持隱藏
     @property( { type: Node } )
     public AutoButtonInfiniteIcon: Node | null = null;
 
@@ -88,6 +96,7 @@ export class GameUIController extends Component
         this.updateAutoSpinView();
     }
 
+    // Component 啟用時註冊玩家操作，並立即以目前 Game Data 套用一次 View
     protected onEnable(): void
     {
         this.SpinButton?.node.on( Button.EventType.CLICK, this.onSpinButtonClick, this );
@@ -120,6 +129,7 @@ export class GameUIController extends Component
         this._lastWin = null;
     }
 
+    // Auto 是 SelectionPanel 的第一個使用者；Panel 只取得顯示資料與 selection callback，不知道 Auto 規則
     private configureAutoSelectionPanel(): void
     {
         if ( !this.SelectionPanel )
@@ -272,6 +282,7 @@ export class GameUIController extends Component
         this._lastAutoSpinCount = autoSpinCount;
         this._lastIsAutoRunning = isAutoRunning;
 
+        // 最後一局開始後 Count 已經是 0，但 Auto 仍在執行；必須等該 Round 完整結束後才能恢復預設 Button
         const hasAutoSetting: boolean = autoSpinCount > 0 || isAutoRunning;
 
         if ( !hasAutoSetting )
@@ -285,6 +296,7 @@ export class GameUIController extends Component
 
         const isInfinite: boolean = autoSpinCount === AUTO_SPIN_INFINITE_COUNT;
 
+        // Infinite 使用獨立 Icon 呈現，不讓內部約定值 9999 洩漏到玩家畫面
         if ( isInfinite )
         {
             this.AutoButtonLabel.string = '';
@@ -296,6 +308,7 @@ export class GameUIController extends Component
 
         const selectedOption: ISelectionOption | undefined = AUTO_SELECTION_OPTIONS.find( option => option.Value === autoSpinCount );
 
+        // Auto 執行中的 49、48...不在預設選項內，因此找不到 Label 時直接顯示剩餘局數
         this.AutoButtonLabel.string = selectedOption?.Label ?? `${autoSpinCount}`;
         this.AutoButtonLabel.node.active = true;
         this.AutoButtonInfiniteIcon.active = false;
