@@ -58,7 +58,7 @@ export class SlotGameManager extends Component
         return ( this.SlotProcessor?.CanStartRound ?? false ) && ( this.PlayerInfo?.CanAffordBet ?? false );
     }
 
-    // Skip 是否可用由目前 Round 的 Reel Flow 決定，不由 UI 自行推測停輪 Timing
+    // Skip 是否可用由目前 Round 的 Reel / Reward Flow 決定，不由 UI 推測內部 Timing
     public get CanSkipRound(): boolean
     {
         return this.SlotProcessor?.CanSkipRound ?? false;

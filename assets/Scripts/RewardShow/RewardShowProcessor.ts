@@ -49,6 +49,12 @@ export class RewardShowProcessor extends Component
             && this.ReelController !== null;
     }
 
+    // 只有 Reward 正在播放時才能由玩家提前結束演出
+    public get CanSkipReward(): boolean
+    {
+        return this._fsMachine.CurrentState === RewardShowProcessorState.Showing;
+    }
+
     protected onLoad(): void
     {
         this.initFSM();
@@ -66,6 +72,22 @@ export class RewardShowProcessor extends Component
         this._onRewardFinished = onRewardFinished;
 
         this._fsMachine.ChangeState( RewardShowProcessorState.Showing );
+    }
+
+    // Skip 只提前結束目前演出，仍沿用既有 Reward Complete 與 onRewardFinished Flow
+    public SkipReward(): void
+    {
+        if ( !this.CanSkipReward )
+        {
+            return;
+        }
+
+        for ( const rewardTarget of this._rewardEffectTargets )
+        {
+            this.ReelController.ResetWin( rewardTarget.ReelIndex, rewardTarget.RowIndex );
+        }
+
+        this.completeReward();
     }
 
     private initFSM(): void

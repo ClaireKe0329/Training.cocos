@@ -146,6 +146,13 @@ export class Reel extends Component
         this.SlotUnits[ visibleIndex ].PlayWin();
     }
 
+    // 停止目前可視區域指定 Row 的 WinEffect，不改動盤面 Symbol
+    public ResetWin( rowIndex: number ): void
+    {
+        const visibleIndex: number = rowIndex + VISIBLE_START_INDEX;
+        this.SlotUnits[ visibleIndex ].ResetWin();
+    }
+
     // 初始化狀態機
     private initFSM(): void
     {

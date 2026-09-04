@@ -74,11 +74,20 @@ export class SlotProcessor extends Component
             && this.RewardShowProcessor.CanShowReward;
     }
 
-    // 目前是否處於 Reel Flow 並允許要求 Skip
+    // 目前 Round 是否存在可由玩家 Skip 的 Reel 或 Reward 演出階段
     public get CanSkipRound(): boolean
     {
-        return this._fsMachine.CurrentState === SlotProcessorState.Spinning
-            && ( this.ReelController?.CanSkipSpin ?? false );
+        if ( this._fsMachine.CurrentState === SlotProcessorState.Spinning )
+        {
+            return this.ReelController?.CanSkipSpin ?? false;
+        }
+
+        if ( this._fsMachine.CurrentState === SlotProcessorState.ShowingReward )
+        {
+            return this.RewardShowProcessor?.CanSkipReward ?? false;
+        }
+
+        return false;
     }
 
     // Component 載入時建立 Round FSM
@@ -108,7 +117,7 @@ export class SlotProcessor extends Component
         this._fsMachine.ChangeState( SlotProcessorState.Spinning );
     }
 
-    // 將目前 Round 的 Skip 操作交給 ReelController
+    // SlotProcessor 依 Round State 將同一個 Skip 操作交給目前演出的 Reel 或 Reward owner
     public SkipRound(): void
     {
         if ( !this.CanSkipRound )
@@ -116,7 +125,16 @@ export class SlotProcessor extends Component
             return;
         }
 
-        this.ReelController.SkipSpin();
+        if ( this._fsMachine.CurrentState === SlotProcessorState.Spinning )
+        {
+            this.ReelController.SkipSpin();
+            return;
+        }
+
+        if ( this._fsMachine.CurrentState === SlotProcessorState.ShowingReward )
+        {
+            this.RewardShowProcessor.SkipReward();
+        }
     }
 
     // 初始化 Round FSM，將各階段真正的流程行為交由對應 State 負責

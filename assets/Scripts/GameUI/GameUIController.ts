@@ -283,7 +283,7 @@ export class GameUIController extends Component
         this._lastCanSkipRound = canSkipRound;
         this._lastIsTurbo = isTurbo;
 
-        // StopSpin Command 與 Reel 真正完成不同，因此 Stop Button 是否可用只讀取公開 CanSkipRound
+        // Reel / Reward 各自決定能否接受 Skip；UI 只依公開 CanSkipRound 同步 Stop Button
         this.SpinButton.node.active = !isRoundRunning;
         this.StopButton.node.active = isRoundRunning;
         this.StopButton.interactable = canSkipRound;

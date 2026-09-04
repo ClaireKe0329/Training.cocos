@@ -123,6 +123,12 @@ export class ReelController extends Component
         this.Reels[ reelIndex ].PlayWin( rowIndex );
     }
 
+    // 將指定盤面位置的 WinEffect 停止要求交給對應 Reel
+    public ResetWin( reelIndex: number, rowIndex: number ): void
+    {
+        this.Reels[ reelIndex ].ResetWin( rowIndex );
+    }
+
     // 玩家要求快速停輪；結果尚未準備完成時，本次操作不生效也不保存
     public SkipSpin(): void
     {
