@@ -76,6 +76,12 @@ export class SlotGameManager extends Component
         this._autoSpinCount = autoSpinCount;
     }
 
+    // 修改玩家下一局使用的 Bet；目前 Round 已保存 roundBet snapshot，因此中途變更不影響本局
+    public SetBet( bet: number ): void
+    {
+        this.PlayerInfo?.SetBet( bet );
+    }
+
     // 從目前 Auto 設定正式進入 Auto Flow，並開始第一局
     public StartAuto(): void
     {

@@ -7,7 +7,7 @@ import { SelectionPanel } from './SelectionPanel';
 
 const { ccclass, property } = _decorator;
 
-// 負責玩家操作與 UI 顯示；Game Logic 操作交給 SlotGameManager，玩家資料只透過 PlayerInfo 公開介面存取
+// 負責玩家操作與 UI 顯示；Game Logic 操作交給 SlotGameManager，玩家資料只從 PlayerInfo 讀取
 @ccclass( 'GameUIController' )
 export class GameUIController extends Component
 {
@@ -60,11 +60,11 @@ export class GameUIController extends Component
     @property( { type: Label } )
     public WinLabel: Label | null = null;
 
-    // 提供 Round、Turbo、Auto 等 Game-Level 操作與公開狀態
+    // 提供 Round、Turbo、Auto、Bet 等 Game-Level 操作與公開狀態
     @property( { type: SlotGameManager } )
     public SlotGameManager: SlotGameManager | null = null;
 
-    // 提供 Balance、Bet、Win；Bet 選擇只透過 PlayerInfo 的公開 API 寫入
+    // 提供 Balance、Bet、Win 顯示資料；GameUIController 只讀取，不直接修改玩家資料
     @property( { type: PlayerInfo } )
     public PlayerInfo: PlayerInfo | null = null;
 
@@ -250,15 +250,15 @@ export class GameUIController extends Component
         this.BetSelectionPanel.Show( this.PlayerInfo.Bet );
     }
 
-    // BetSelectionPanel 不允許取消整組選擇；有效數值直接交由 PlayerInfo 保存
+    // BetSelectionPanel 不允許取消整組選擇；有效數值交由 SlotGameManager 修改 PlayerInfo
     private onBetChanged( selectedValue: number | null ): void
     {
-        if ( !this.PlayerInfo || selectedValue === null )
+        if ( !this.SlotGameManager || selectedValue === null )
         {
             return;
         }
 
-        this.PlayerInfo.SetBet( selectedValue );
+        this.SlotGameManager.SetBet( selectedValue );
         this.updateGameDataView();
     }
 
@@ -293,7 +293,7 @@ export class GameUIController extends Component
         this.TurboOnButton.node.active = isTurbo;
     }
 
-    // Balance、Bet、Win 的 owner 是 PlayerInfo；UI 只透過公開資料與操作同步 Label
+    // Balance、Bet、Win 的 owner 是 PlayerInfo；UI 只將最新資料呈現在 Label
     private updateGameDataView(): void
     {
         if ( !this.PlayerInfo || !this.BalanceLabel || !this.BetLabel || !this.WinLabel )

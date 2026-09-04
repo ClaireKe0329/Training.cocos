@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, instantiate, Label, Layout, Node, Prefab, ToggleContainer } from 'cc';
+import { _decorator, Button, Component, instantiate, Layout, Node, Prefab, ToggleContainer } from 'cc';
 import { ISelectionOption, SelectionOption } from './SelectionOption';
 
 const { ccclass, property } = _decorator;
@@ -7,10 +7,6 @@ const { ccclass, property } = _decorator;
 @ccclass( 'SelectionPanel' )
 export class SelectionPanel extends Component
 {
-    // Title 內容由各自的 Prefab instance 在 Inspector 設定，不在 Runtime 依用途切換
-    @property( { type: Label } )
-    public TitleLabel: Label | null = null;
-
     // 動態建立的 SelectionOption 都加入此 Node；Option 的生命週期跟選項內容走，不跟 Panel Show / Hide 綁定
     @property( { type: Node } )
     public OptionContainer: Node | null = null;
@@ -36,7 +32,7 @@ export class SelectionPanel extends Component
     // 將目前整組 Selection 回傳給外部；null 只代表此 Panel 現在沒有任何選項被選中
     private _onSelectionChanged: ( ( selectedValue: number | null ) => void ) | null = null;
 
-    // 只有選項內容改變時才重新建立 Options；Title、Grid 與 Toggle 規則由各自的 Prefab instance 決定
+    // 只有選項內容改變時才重新建立 Options；Panel 標題、Grid 與 Toggle 規則都由 Prefab instance 決定
     public Configure( options: ISelectionOption[], onSelectionChanged: ( selectedValue: number | null ) => void ): void
     {
         if ( !this.OptionContainer || !this.ToggleGroup || !this.OptionLayout || !this.SelectionOptionPrefab )
