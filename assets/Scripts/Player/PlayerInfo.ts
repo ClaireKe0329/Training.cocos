@@ -53,6 +53,12 @@ export class PlayerInfo extends Component
         this._balance -= this._bet;
     }
 
+    // 設定玩家下一局使用的 Bet；已開始的 Round 使用自己的 Bet snapshot，不受後續選擇影響
+    public SetBet( bet: number ): void
+    {
+        this._bet = bet;
+    }
+
     // 清除上一局顯示的 Win
     public ResetWin(): void
     {

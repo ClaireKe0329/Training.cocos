@@ -1,20 +1,9 @@
 import { JsonAsset } from 'cc';
 import { GameUtility } from './GameUtility';
+import { IAutoSpinSettings, IBetSettings } from '../GameData/SelectionSettings';
 import { SYMBOL_TYPE_LIST, SymbolType } from '../GameData/SymbolType';
 import { ISymbolMultiplier } from '../GameData/SymbolMultiplier';
 import { IReelSpeedSettings, IReelSpeedSetting } from '../Reel/ReelSpeed';
-
-// 共用選擇型設定；未來 Bet 選單可沿用同一份資料結構
-export interface ISelectionSettings
-{
-    readonly SelectionOptions: number[];
-}
-
-// Auto 除了可選局數之外，還需要知道哪個值代表 Infinite
-export interface IAutoSpinSettings extends ISelectionSettings
-{
-    readonly InfiniteCount: number;
-}
 
 // 定義 config.json 載入後必須提供的遊戲設定
 export interface IGameConfig
@@ -39,6 +28,9 @@ export interface IGameConfig
 
     // Auto 可選局數與 Infinite sentinel
     readonly AutoSpinSettings: IAutoSpinSettings;
+
+    // 玩家可選擇的 Bet
+    readonly BetSettings: IBetSettings;
 
     // 所有 Payline，每個值代表該 Reel 對應的 Row Index
     readonly Paylines: number[][];
@@ -100,6 +92,7 @@ export class GameConfig
         }
 
         this.validateAutoSpinSettings( config.AutoSpinSettings );
+        this.validateBetSettings( config.BetSettings );
         this.validatePaylines( config.Paylines );
         this.validateSymbolMultipliers( config.SymbolMultipliers );
 
@@ -143,15 +136,21 @@ export class GameConfig
         return this.getConfig().RewardShowDuration;
     }
 
-    // 回傳副本，避免外部直接修改 Config 保存的 Auto 選項
-    public get AutoSpinSelectionOptions(): number[]
+    // 回傳副本，避免外部直接修改 Config 保存的 Auto 局數
+    public get AutoSpinCounts(): number[]
     {
-        return [ ...this.getConfig().AutoSpinSettings.SelectionOptions ];
+        return [ ...this.getConfig().AutoSpinSettings.SpinCounts ];
     }
 
     public get AutoSpinInfiniteCount(): number
     {
         return this.getConfig().AutoSpinSettings.InfiniteCount;
+    }
+
+    // 回傳副本，避免外部直接修改 Config 保存的 Bet 選項
+    public get BetValues(): number[]
+    {
+        return [ ...this.getConfig().BetSettings.BetValues ];
     }
 
     // 回傳副本，避免外部直接修改 Config 內的 Payline
@@ -199,14 +198,14 @@ export class GameConfig
     // Config 只保證 Auto 必要設定存在且數值可使用；實際選項內容由 config.json 維護者負責
     private validateAutoSpinSettings( autoSpinSettings: IAutoSpinSettings ): void
     {
-        if ( !autoSpinSettings?.SelectionOptions || autoSpinSettings.SelectionOptions.length === 0 )
+        if ( !autoSpinSettings?.SpinCounts || autoSpinSettings.SpinCounts.length === 0 )
         {
             throw new Error( '[GameConfig] 缺少 Auto Spin 選項設定。' );
         }
 
-        for ( const option of autoSpinSettings.SelectionOptions )
+        for ( const spinCount of autoSpinSettings.SpinCounts )
         {
-            if ( option <= 0 )
+            if ( spinCount <= 0 )
             {
                 throw new Error( '[GameConfig] Auto Spin 選項必須大於 0。' );
             }
@@ -215,6 +214,23 @@ export class GameConfig
         if ( !autoSpinSettings.InfiniteCount || autoSpinSettings.InfiniteCount <= 0 )
         {
             throw new Error( '[GameConfig] 缺少有效的 Auto Spin Infinite 設定。' );
+        }
+    }
+
+    // Config 只保證 Bet 選項存在且數值可使用；實際選項內容由 config.json 維護者負責
+    private validateBetSettings( betSettings: IBetSettings ): void
+    {
+        if ( !betSettings?.BetValues || betSettings.BetValues.length === 0 )
+        {
+            throw new Error( '[GameConfig] 缺少 Bet 選項設定。' );
+        }
+
+        for ( const betValue of betSettings.BetValues )
+        {
+            if ( betValue <= 0 )
+            {
+                throw new Error( '[GameConfig] Bet 選項必須大於 0。' );
+            }
         }
     }
 

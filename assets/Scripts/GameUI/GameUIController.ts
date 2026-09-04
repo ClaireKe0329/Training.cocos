@@ -7,7 +7,7 @@ import { SelectionPanel } from './SelectionPanel';
 
 const { ccclass, property } = _decorator;
 
-// 負責玩家操作與 UI 顯示；Game Logic 操作交給 SlotGameManager，玩家資料只從 PlayerInfo 讀取
+// 負責玩家操作與 UI 顯示；Game Logic 操作交給 SlotGameManager，玩家資料只透過 PlayerInfo 公開介面存取
 @ccclass( 'GameUIController' )
 export class GameUIController extends Component
 {
@@ -39,9 +39,17 @@ export class GameUIController extends Component
     @property( { type: Node } )
     public AutoButtonInfiniteIcon: Node | null = null;
 
-    // Auto 專用的 SelectionPanel instance；未來 Bet 使用同一 Prefab 建立另一份 instance
+    // Auto 專用的 SelectionPanel instance；Bet 使用同一 Prefab 的另一份 instance
     @property( { type: SelectionPanel } )
     public AutoSelectionPanel: SelectionPanel | null = null;
+
+    // 開啟 BetSelectionPanel 的按鈕
+    @property( { type: Button } )
+    public BetButton: Button | null = null;
+
+    // Bet 使用獨立的 SelectionPanel instance，避免與 Auto 在 Runtime 切換用途與 View 設定
+    @property( { type: SelectionPanel } )
+    public BetSelectionPanel: SelectionPanel | null = null;
 
     @property( { type: Label } )
     public BalanceLabel: Label | null = null;
@@ -56,7 +64,7 @@ export class GameUIController extends Component
     @property( { type: SlotGameManager } )
     public SlotGameManager: SlotGameManager | null = null;
 
-    // 提供 Balance、Bet、Win 顯示資料；GameUIController 只讀取，不修改玩家資料
+    // 提供 Balance、Bet、Win；Bet 選擇只透過 PlayerInfo 的公開 API 寫入
     @property( { type: PlayerInfo } )
     public PlayerInfo: PlayerInfo | null = null;
 
@@ -70,10 +78,11 @@ export class GameUIController extends Component
     private _lastBet: number | null = null;
     private _lastWin: number | null = null;
 
-    // Auto Panel 的 Option Nodes 在用途不變時只建立一次；Title、Grid 欄數與 allowSwitchOff 由 Prefab instance 決定
+    // 各 Panel 的 Option Nodes 在用途不變時只建立一次；Title、Grid 欄數與 allowSwitchOff 由 Prefab instance 決定
     protected start(): void
     {
         this.configureAutoSelectionPanel();
+        this.configureBetSelectionPanel();
     }
 
     // 每幀只同步可能由 Game Logic 改變的公開資料，不由 UI 自行決定狀態
@@ -92,6 +101,7 @@ export class GameUIController extends Component
         this.TurboOffButton?.node.on( Button.EventType.CLICK, this.onTurboButtonClick, this );
         this.TurboOnButton?.node.on( Button.EventType.CLICK, this.onTurboButtonClick, this );
         this.AutoButton?.node.on( Button.EventType.CLICK, this.onAutoButtonClick, this );
+        this.BetButton?.node.on( Button.EventType.CLICK, this.onBetButtonClick, this );
 
         this.updateButtonState();
         this.updateGameDataView();
@@ -106,6 +116,7 @@ export class GameUIController extends Component
         this.TurboOffButton?.node.off( Button.EventType.CLICK, this.onTurboButtonClick, this );
         this.TurboOnButton?.node.off( Button.EventType.CLICK, this.onTurboButtonClick, this );
         this.AutoButton?.node.off( Button.EventType.CLICK, this.onAutoButtonClick, this );
+        this.BetButton?.node.off( Button.EventType.CLICK, this.onBetButtonClick, this );
 
         this._lastIsRoundRunning = null;
         this._lastCanSkipRound = null;
@@ -127,12 +138,28 @@ export class GameUIController extends Component
 
         const gameConfig: GameConfig = GameConfig.GetInstance();
         const infiniteCount: number = gameConfig.AutoSpinInfiniteCount;
-        const selectionOptions: ISelectionOption[] = gameConfig.AutoSpinSelectionOptions.map( ( optionValue: number ): ISelectionOption => ( {
-            Label: optionValue === infiniteCount ? '∞' : `${optionValue}`,
-            Value: optionValue,
+        const selectionOptions: ISelectionOption[] = gameConfig.AutoSpinCounts.map( ( spinCount: number ): ISelectionOption => ( {
+            Label: spinCount === infiniteCount ? '∞' : `${spinCount}`,
+            Value: spinCount,
         } ) );
 
         this.AutoSelectionPanel.Configure( selectionOptions, this.onAutoSpinCountChanged.bind( this ) );
+    }
+
+    // Bet 選項的數值與顯示文字相同；SelectionPanel 只接收 View 所需的 Label / Value mapping
+    private configureBetSelectionPanel(): void
+    {
+        if ( !this.BetSelectionPanel )
+        {
+            return;
+        }
+
+        const selectionOptions: ISelectionOption[] = GameConfig.GetInstance().BetValues.map( ( betValue: number ): ISelectionOption => ( {
+            Label: `${betValue}`,
+            Value: betValue,
+        } ) );
+
+        this.BetSelectionPanel.Configure( selectionOptions, this.onBetChanged.bind( this ) );
     }
 
     // 玩家按 Spin 時，沒有 Auto 設定就啟動單一 Round；已有 Auto 設定則正式進入 Auto Flow
@@ -212,6 +239,29 @@ export class GameUIController extends Component
         this.updateAutoSpinView();
     }
 
+    // Bet Panel 每次開啟都以 PlayerInfo 的最新值同步 Toggle，不把 Panel 上次狀態當成玩家資料
+    private onBetButtonClick(): void
+    {
+        if ( !this.PlayerInfo || !this.BetSelectionPanel )
+        {
+            return;
+        }
+
+        this.BetSelectionPanel.Show( this.PlayerInfo.Bet );
+    }
+
+    // BetSelectionPanel 不允許取消整組選擇；有效數值直接交由 PlayerInfo 保存
+    private onBetChanged( selectedValue: number | null ): void
+    {
+        if ( !this.PlayerInfo || selectedValue === null )
+        {
+            return;
+        }
+
+        this.PlayerInfo.SetBet( selectedValue );
+        this.updateGameDataView();
+    }
+
     // 依目前 Round、Skip 與 Turbo 狀態同步按鈕顯示
     private updateButtonState(): void
     {
@@ -243,7 +293,7 @@ export class GameUIController extends Component
         this.TurboOnButton.node.active = isTurbo;
     }
 
-    // Balance、Bet、Win 的 owner 是 PlayerInfo；UI 只將最新資料呈現在 Label
+    // Balance、Bet、Win 的 owner 是 PlayerInfo；UI 只透過公開資料與操作同步 Label
     private updateGameDataView(): void
     {
         if ( !this.PlayerInfo || !this.BalanceLabel || !this.BetLabel || !this.WinLabel )
@@ -317,7 +367,7 @@ export class GameUIController extends Component
             return;
         }
 
-        // Auto 執行中的 49、48...直接顯示 Manager 的剩餘 Count，不依賴原始 SelectionOptions
+        // Auto 執行中的 49、48...直接顯示 Manager 的剩餘 Count，不依賴原始 SpinCounts
         this.AutoButtonLabel.string = `${autoSpinCount}`;
         this.AutoButtonLabel.node.active = true;
         this.AutoButtonInfiniteIcon.active = false;
