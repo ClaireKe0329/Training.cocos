@@ -1,157 +1,208 @@
-# Mahjong 專案完成總結
-## 索引
-- [核心架構概念](#核心架構概念)
-  - [1 遊戲啟動與進入遊戲](#1-遊戲啟動與進入遊戲)
-  - [2 Server Notify 解析方式](#2-server-notify-解析方式)
-  - [3 Notify 對應演出狀態](#3-notify-對應演出狀態)
-- [Notify 類型與責任（摘要）](#notify-類型與責任摘要)
-- [架構圖網址（Miro）](#架構圖網址miro)
-- [工具整合：Excel 表格](#工具整合excel-表格)
-- [已表格化的資料模組](#已表格化的資料模組)
-- [未來優化](#未來優化)
+# Cocos Slot 新人訓練
 
-## 核心架構概念
- 
-### 1 遊戲啟動與進入遊戲
-- 遊戲啟動入口
-  - Cocos v3.8.3
-  - \assets\Start\Controller\main.ts
-  - start.scene
-- 遊戲 Config 設定
-  - ```json
- 
-- **MahjongLanguageTable(未完成)**
-  - 用途：多語系字串（UI 文案、牌型名稱、系統提示等）
-  - 效益：可快速新增語言/改文案，避免散落在程式中
-  - 路徑：assets\Json\MahjongLanguageTable
- 
-- **MahjongFanTable**
-  - 用途：番型定義、番數/台數、判定條件描述、顯示排序等、是否顯示大獎(未完成)
-  - 效益：番型擴充與數值調整不用改邏輯層（僅需補表與對應 key）
-  - 路徑：assets\Json\MahjongFanTable
- 
-- **MahjongErrorTable**
-  - 用途：錯誤碼 → 顯示標題/內容（可配合 i18n）
-  - 效益：Server error code 對應顯示統一管理，避免 UI 到處寫 switch-case
-  - 路徑：assets\Json\MahjongErrorTable
- 
-- **VoicePath、VoiceName**
-  - 用途：依照語音人物不同進行分類，用以檢索不同人物與區分不同性別，對應不同語音音量
-  - 效益：音訊資源統一管理、方便替換與調整，避免硬綁檔名與路徑
-  - 路徑：assets\Audio\table\VoicePath & assets\Audio\table\VoiceName
+使用 **Cocos Creator 3.8.3 + TypeScript** 製作的基礎 Slot Game。
 
-- **SystemVoice**
-  - 用途：整理系統語音撥放路徑與相對應的音量
-  - 效益：音訊資源統一管理、方便替換與調整
-  - 路徑：assets\Audio\table\SystemVoice
+本專案為公司新人訓練作業，主要練習 Slot 遊戲的基本流程與程式架構，包括 Reel 滾動、Spin Result、Payline 判斷、Score Calculation、Reward、Auto Spin、Skip 與 State Machine。
 
-- **EffectAudio**
-  - 用途：整理音效撥放路徑與相對應的音量，吃碰槓相關音效id用以對應程式enum參數
-  - 效益：音訊資源統一管理、方便替換與調整
-  - 路徑：assets\Audio\table\EffectAudio
+專案架構參考公司既有 Slot 專案的 Responsibility 分層方式，並依新人訓練需求縮小實作範圍，讓各模組的責任與依賴方向保持清楚。
 
-- **BGMAudio**
-  - 用途：整理背景音樂撥放路徑與相對應的音量，路徑以陣列的方式實現BGM隨機選取功能
-  - 效益：音訊資源統一管理、方便替換與調整
-  - 路徑：assets\Audio\table\BGMAudio
+## 開發環境
 
+- Cocos Creator 3.8.3
+- TypeScript
+- 5 Reels × 3 Rows
+- 8 Symbols
+- 25 Paylines
 
-## 未來優化
-  **未來優化.md**
-  - [Mahjong未來優化](未來優化.md)
-  
-=======
-# Training.cocos
+## 遊戲功能
 
+### Spin
 
+玩家按下 Spin 後會開始一局完整的 Slot 流程：
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin http://git.tp.wanin.tw/Claire/training.cocos.git
-git branch -M main
-git push -uf origin main
+```text
+Start Round
+    ↓
+Reel Spin
+    ↓
+取得 Spin Result
+    ↓
+Reel Stop
+    ↓
+Payline Check
+    ↓
+Score Calculation
+    ↓
+Reward
+    ↓
+Round Complete
 ```
 
-## Integrate with your tools
+### Reel
 
-* [Set up project integrations](http://git.tp.wanin.tw/Claire/training.cocos/-/settings/integrations)
+- 五軸同時開始滾動
+- Reel 依序停止
+- 根據 Spin Result 顯示指定盤面
+- 停輪時播放 Shock 表現
+- 支援 Normal、Turbo 與 Skip 速度
 
-## Collaborate with your team
+### Payline
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+使用 25 條 Payline 判斷盤面結果。
 
-## Test and Deploy
+每條 Payline 都從最左側 Reel 開始，依序向右判斷相同 Symbol 的連續數量，並根據 3、4、5 連結果計算得分。
 
-Use the built-in continuous integration in GitLab.
+### Player Info
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+遊戲顯示：
 
-***
+- Balance
+- Bet
+- Win
 
-# Editing this README
+Bet 可透過 Bet Selection Panel 選擇。
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Auto Spin
 
-## Suggestions for a good README
+玩家可以選擇 Auto Spin 局數後開始自動遊戲。
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+支援：
 
-## Name
-Choose a self-explaining name for your project.
+- 指定局數
+- Infinite Auto
+- 執行中停止 Auto
+- Auto Spin 過程切換 Turbo
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### Skip
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Spin 過程中可使用 Stop 加速剩餘 Reel 的停輪流程。
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Reward 播放期間可再次使用 Stop 跳過目前的中獎演出。
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+Skip 只縮短演出流程，不會改變該局的 Spin Result 或 Score。
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## 操作方式
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+| 操作 | 功能 |
+|---|---|
+| Spin | 開始 Manual Spin，已設定 Auto 時則開始 Auto Spin |
+| Stop | 加速 Reel 停輪，Reward 播放期間可跳過演出 |
+| Turbo | 切換 Normal / Turbo |
+| Auto | 選擇 Auto Spin 局數，執行中再次點擊可停止後續 Auto |
+| Bet | 選擇下一局使用的 Bet |
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+## 專案結構
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```text
+assets/
+├─ Data/
+│  └─ config.json
+│
+├─ Prefabs/
+│  ├─ GameUI/
+│  └─ Reel/
+│
+├─ Scenes/
+│  └─ Main.scene
+│
+└─ Scripts/
+   ├─ GameData/
+   ├─ GameUI/
+   ├─ GameUtility/
+   ├─ MainScene/
+   ├─ Player/
+   ├─ Reel/
+   ├─ RewardShow/
+   └─ SlotGameManager/
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## 核心模組
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+### GameUIController
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+處理玩家操作與 UI 顯示。
 
-## License
-For open source projects, say how it is licensed.
+### SlotGameManager
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
->>>>>>> e0726829e90b91e6ab24ff1cc4fe3f44a27cb79a
+提供遊戲操作入口，管理 Auto、Turbo、Bet、Round Settlement 等 Game-Level 流程。
+
+### SlotProcessor
+
+負責單一 Round 的流程協調，串接 Spin Result、Reel 與 Reward。
+
+### LocalSpinResultProvider
+
+產生本局盤面，並透過 `SpinResultChecker` 與 `ScoreCalculator` 建立完整的 `SpinResultData`。
+
+### SpinResultChecker
+
+根據盤面與 Payline 判斷中獎結果。
+
+### ScoreCalculator
+
+根據 Line Result、Bet 與 Symbol Multiplier 計算各線得分與 Total Score。
+
+### ReelController
+
+管理五軸 Reel 的 Start、Stop Sequence、Speed、Skip 與 Completion。
+
+### Reel
+
+管理單軸 SlotUnit 循環、最終結果放置與停輪流程。
+
+### SlotUnit
+
+負責單一 Symbol 的顯示與 Win Effect。
+
+### RewardShowProcessor
+
+根據既有的 Spin Result 播放中獎表現並管理 Reward Flow。
+
+### PlayerInfo
+
+保存玩家的 Balance、Bet 與 Win。
+
+## State Flow
+
+專案依不同 Responsibility 分別管理自己的 State。
+
+```text
+SlotProcessor
+Idle → Spinning → ShowingReward → Complete → Idle
+
+ReelController
+Idle → Spinning → Stopping → Complete → Idle
+
+Reel
+Idle → Run → ReadyToStop → Stop → Shock → Idle
+
+RewardShowProcessor
+Idle → Showing → Complete → Idle
+```
+
+Auto Spin 屬於操作模式，Manual 與 Auto 共用相同的 Round Flow。
+
+## Game Config
+
+主要遊戲設定集中於：
+
+```text
+assets/Data/config.json
+```
+
+包含：
+
+- Reel Speed Settings
+- Shock Settings
+- Initial Balance / Bet
+- Reward Show Duration
+- Auto Spin Settings
+- Bet Settings
+- Paylines
+- Symbol Multipliers
+
+## 執行方式
+
+1. 使用 **Cocos Creator 3.8.3** 開啟專案。
+2. 開啟 `assets/Scenes/Main.scene`。
+3. 使用 Cocos Creator Preview 執行遊戲。
