@@ -75,7 +75,7 @@ export class Reel extends Component
     // 所有 Component onLoad 完成後初始化 Reel 顯示
     protected start(): void
     {
-        this.ResetReel();
+        this.InitReel();
     }
 
     // 每幀交由 FSM 執行目前 State 的 Update
@@ -87,12 +87,12 @@ export class Reel extends Component
     // 讓 Reel 使用指定速度從 Idle 進入 Run
     public StartSpin( spinSpeed: number ): void
     {
-        if ( this._fsMachine.CurrentState !== ReelState.Idle || this.SlotUnits.length !== GameUtility.GetReelSlotUnitCount() )
+        if ( this._fsMachine.CurrentState !== ReelState.Idle )
         {
             return;
         }
 
-        this._spinSpeed = spinSpeed;
+        this.SetSpinSpeed( spinSpeed );
 
         for ( const slotUnit of this.SlotUnits )
         {
@@ -102,7 +102,7 @@ export class Reel extends Component
         this._fsMachine.ChangeState( ReelState.Run );
     }
 
-    // Spin 進行中切換 Reel 的移動速度
+    // 切換 Reel 的移動速度
     public SetSpinSpeed( spinSpeed: number ): void
     {
         this._spinSpeed = spinSpeed;
@@ -120,8 +120,8 @@ export class Reel extends Component
         this._fsMachine.ChangeState( ReelState.ReadyToStop );
     }
 
-    // 重設 Reel 狀態、停輪資料與 SlotUnit
-    public ResetReel(): void
+    // 初始化 Reel 狀態、停輪資料與 SlotUnit
+    public InitReel(): void
     {
         this._fsMachine.ChangeState( ReelState.Idle );
         this._spinSpeed = 0;
@@ -129,6 +129,11 @@ export class Reel extends Component
         this._stopSymbols = [];
         this._stopSymbolCount = 0;
         this._shockElapsedTime = 0;
+
+        if ( this.SlotUnits.length !== GameUtility.GetReelSlotUnitCount() )
+        {
+            throw new Error( "SlotUnits 數量不符合預期的 Reel SlotUnit 數量" );
+        }
 
         for ( let index: number = 0; index < this.SlotUnits.length; index++ )
         {
@@ -189,7 +194,7 @@ export class Reel extends Component
     {
         this.moveReel( deltaTime );
 
-        // 高速移動時同一幀可能經過多格，每跨一格都要依序補入對應的停輪 Symbol
+        // 高速移動時同一幀可能經過多格，每跨一格都要依序補入對應的停輪 Symbol  
         while ( this._reelVerticalOffset <= 0 )
         {
             this.moveSlotUnitToFirst();
@@ -201,13 +206,6 @@ export class Reel extends Component
             }
 
             this._fsMachine.ChangeState( ReelState.Stop );
-
-            // 這一幀剩餘的移動距離已經到達最終停輪位置時，不需要再等待下一幀
-            if ( this._reelVerticalOffset <= 0 )
-            {
-                this._reelVerticalOffset = 0;
-                this._fsMachine.ChangeState( ReelState.Shock );
-            }
 
             break;
         }
@@ -247,7 +245,7 @@ export class Reel extends Component
         // 使用 Sin 曲線讓 Reel 先向下位移再回到原始位置
         this._reelVerticalOffset = -gameConfig.ShockDistance * Math.sin( Math.PI * shockRatio );
 
-        if ( shockRatio >= 1 )
+        if ( shockRatio === 1 )
         {
             this._reelVerticalOffset = 0;
             this._fsMachine.ChangeState( ReelState.Idle );
@@ -259,7 +257,8 @@ export class Reel extends Component
     // 依目前 Spin Speed 更新 Reel 的垂直位移
     private moveReel( deltaTime: number ): void
     {
-        this._reelVerticalOffset -= this._spinSpeed * deltaTime;
+        const offset = this._reelVerticalOffset - this._spinSpeed * deltaTime
+        this._reelVerticalOffset = Math.max( offset, - this.SymbolHeight );
     }
 
     // 回收移出下方的 SlotUnit 到 Reel 上方，並補回一格位移維持畫面連續

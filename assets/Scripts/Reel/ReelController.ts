@@ -72,13 +72,16 @@ export class ReelController extends Component
     // 只有目前沒有進行中的 Spin，且 Reel 數量正確時才能開始下一次 Spin
     public get CanStartSpin(): boolean
     {
-        return this._fsMachine.CurrentState === ReelControllerState.Idle
-            && this.Reels.length === GameUtility.GetSlotColumnCount();
+        return this._fsMachine.CurrentState === ReelControllerState.Idle;
     }
 
     // Component 載入時建立 ReelController 使用的狀態機
     protected onLoad(): void
     {
+        if ( this.Reels.length !== GameUtility.GetSlotColumnCount() )
+        {
+            throw new Error( "Reels 數量不符合預期的 Slot Column 數量" );
+        }
         this.initFSM();
     }
 
@@ -266,12 +269,14 @@ export class ReelController extends Component
     {
         this._stopIntervalElapsedTime += deltaTime;
 
-        // 若這一幀已經經過多個停軸間隔，就把這些時間內應該停下的 Reel 一次處理完
-        while ( this._nextStopReelIndex < this.Reels.length && this._stopIntervalElapsedTime >= reelStopInterval )
+        if ( this._stopIntervalElapsedTime < reelStopInterval )
         {
-            this._stopIntervalElapsedTime -= reelStopInterval;
-            this.stopNextReel();
+            return;
         }
+
+        // 每次停下一軸後重新累計間隔，確保後續 Reel 不會在同一幀連續收到 StopSpin
+        this._stopIntervalElapsedTime = 0;
+        this.stopNextReel();
     }
 
     // 將下一個尚未收到 StopSpin 的 Reel 切入停輪流程
