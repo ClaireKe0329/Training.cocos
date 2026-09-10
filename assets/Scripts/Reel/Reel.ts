@@ -257,8 +257,8 @@ export class Reel extends Component
     // 依目前 Spin Speed 更新 Reel 的垂直位移
     private moveReel( deltaTime: number ): void
     {
-        const offset = this._reelVerticalOffset - this._spinSpeed * deltaTime
-        this._reelVerticalOffset = Math.max( offset, - this.SymbolHeight );
+        const moveDistance: number = Math.min( this._spinSpeed * deltaTime, this.SymbolHeight );
+        this._reelVerticalOffset -= moveDistance;
     }
 
     // 回收移出下方的 SlotUnit 到 Reel 上方，並補回一格位移維持畫面連續
