@@ -46,7 +46,6 @@ export class RewardShowProcessor extends Component
     public get CanShowReward(): boolean
     {
         return this._fsMachine.CurrentState === RewardShowProcessorState.Idle
-            && this.ReelController !== null;
     }
 
     // 只有 Reward 正在播放時才能由玩家提前結束演出
@@ -57,6 +56,10 @@ export class RewardShowProcessor extends Component
 
     protected onLoad(): void
     {
+        if ( this.ReelController === null )
+        {
+            throw new Error( '[RewardShowProcessor] ReelController 尚未設定。' );
+        }
         this.initFSM();
     }
 
@@ -80,11 +83,6 @@ export class RewardShowProcessor extends Component
         if ( !this.CanSkipReward )
         {
             return;
-        }
-
-        for ( const rewardTarget of this._rewardEffectTargets )
-        {
-            this.ReelController.ResetWin( rewardTarget.ReelIndex, rewardTarget.RowIndex );
         }
 
         this.completeReward();
@@ -111,6 +109,15 @@ export class RewardShowProcessor extends Component
     private enterIdle(): void
     {
         this.unscheduleAllCallbacks();
+
+        for ( const rewardTarget of this._rewardEffectTargets )
+        {
+            this.ReelController.ResetWin(
+                rewardTarget.ReelIndex,
+                rewardTarget.RowIndex
+            );
+        }
+
         this._rewardEffectTargets = [];
         this._onRewardFinished = null;
     }

@@ -7,7 +7,7 @@ import { SlotProcessor } from './SlotProcessor';
 
 const { ccclass, property } = _decorator;
 
-// 提供整台 Slot 的公開操作入口，並負責 Game-Level Operation Mode、Round Settlement 與 Auto Flow
+// 提供整台 Slot 的公開操作入口，並負責跨 Round 的玩家資料更新、Operation Mode、結算與 Auto Flow
 @ccclass( 'SlotGameManager' )
 export class SlotGameManager extends Component
 {
@@ -15,7 +15,7 @@ export class SlotGameManager extends Component
     @property( { type: SlotProcessor } )
     public SlotProcessor: SlotProcessor | null = null;
 
-    // 保存玩家資料；SlotGameManager 只決定各 Round 階段何時修改
+    // 保存玩家目前的 Balance、Bet 與 Win；SlotGameManager 決定各 Round 階段的修改時機
     @property( { type: PlayerInfo } )
     public PlayerInfo: PlayerInfo | null = null;
 
@@ -25,7 +25,7 @@ export class SlotGameManager extends Component
     // Auto 設定值同時作為有限局數的剩餘 Count；0 代表目前沒有 Auto 設定
     private _autoSpinCount: number = 0;
 
-    // Auto 是 Operation Mode，不是 Game State；此旗標只表示 Auto Flow 是否仍要繼續執行
+    // Auto 是 Operation Mode，不是 Game State；此旗標表示 Auto Flow 是否仍要繼續執行
     private _isAutoRunning: boolean = false;
 
     // UI 需要分辨「Count 已到 0 但最後一局仍在執行」與「Auto 已真正結束」
@@ -49,19 +49,28 @@ export class SlotGameManager extends Component
     // 目前是否仍在處理單一 Round
     public get IsRoundRunning(): boolean
     {
-        return this.SlotProcessor?.IsRoundRunning ?? false;
+        return this.SlotProcessor.IsRoundRunning;
     }
 
-    // 新 Round 必須同時滿足 SlotProcessor 已回 Idle，且玩家 Balance 足以支付目前 Bet
+    // 新 Round 必須同時滿足 SlotProcessor 已可開始，且玩家 Balance 足以支付目前 Bet
     public get CanStartRound(): boolean
     {
-        return ( this.SlotProcessor?.CanStartRound ?? false ) && ( this.PlayerInfo?.CanAffordBet ?? false );
+        return this.SlotProcessor.CanStartRound && this.PlayerInfo.CanAffordBet;
     }
 
     // Skip 是否可用由目前 Round 的 Reel / Reward Flow 決定，不由 UI 推測內部 Timing
     public get CanSkipRound(): boolean
     {
-        return this.SlotProcessor?.CanSkipRound ?? false;
+        return this.SlotProcessor.CanSkipRound;
+    }
+
+    // SlotGameManager 的必要依賴必須在 Runtime 開始前完成 Inspector 綁定
+    protected onLoad(): void
+    {
+        if ( !this.SlotProcessor || !this.PlayerInfo )
+        {
+            throw new Error( '[SlotGameManager] SlotProcessor 或 PlayerInfo 尚未設定。' );
+        }
     }
 
     // 切換玩家下一局使用的 Normal / Turbo；目前已開始的 Round 不受影響
@@ -70,16 +79,21 @@ export class SlotGameManager extends Component
         this._reelSpeedLevel = this._reelSpeedLevel === ReelSpeedLevel.Normal ? ReelSpeedLevel.Turbo : ReelSpeedLevel.Normal;
     }
 
-    // 保存玩家選擇的 Auto 局數；選擇本身不開始 Auto 或 Round
+    // 保存玩家選擇的 Auto 局數；Auto 執行中只能停止，不重新修改剩餘局數
     public SetAutoSpinCount( autoSpinCount: number ): void
     {
+        if ( this._isAutoRunning )
+        {
+            return;
+        }
+
         this._autoSpinCount = autoSpinCount;
     }
 
     // 修改玩家下一局使用的 Bet；目前 Round 已保存 roundBet snapshot，因此中途變更不影響本局
     public SetBet( bet: number ): void
     {
-        this.PlayerInfo?.SetBet( bet );
+        this.PlayerInfo.SetBet( bet );
     }
 
     // 從目前 Auto 設定正式進入 Auto Flow，並開始第一局
@@ -104,26 +118,26 @@ export class SlotGameManager extends Component
     // 啟動單一 Round；不判斷這局來自 Manual 或 Auto，也不處理 Auto Count
     public StartRound(): void
     {
-        if ( !this.SlotProcessor || !this.PlayerInfo || !this.CanStartRound )
+        if ( !this.CanStartRound )
         {
             return;
         }
 
-        // 本局 Bet 與 Reel Speed 在 Round 開始時固定，之後 UI 設定變更只影響下一局
+        // 本局 Bet 與 Reel Speed 在 Round 開始時固定，之後設定變更只影響下一局
         const roundBet: number = this.PlayerInfo.Bet;
         const reelSpeedLevel: ReelSpeedLevel = this._reelSpeedLevel;
 
         this.SlotProcessor.StartRound( roundBet, reelSpeedLevel, this.onRewardStarted.bind( this ), this.completeRound.bind( this ) );
 
-        // SlotProcessor 已同步進入 Spinning 後才清除上一局 Win 並扣除本局 Bet
+        // SlotProcessor 已同步進入 Spinning；接著清除上一局 Win，並以本局 Bet snapshot 扣款
         this.PlayerInfo.ResetWin();
-        this.PlayerInfo.DeductBet();
+        this.PlayerInfo.DeductBet( roundBet );
     }
 
     // 將玩家的 Skip 操作交給目前 Round；Skip 不修改 Result、Score 或 Settlement
     public SkipRound(): void
     {
-        if ( !this.SlotProcessor || !this.CanSkipRound )
+        if ( !this.CanSkipRound )
         {
             return;
         }
@@ -131,7 +145,7 @@ export class SlotGameManager extends Component
         this.SlotProcessor.SkipRound();
     }
 
-    // 開始一個 Auto Round，並在這局確定成功開始後更新有限 Auto 的剩餘局數
+    // 開始下一個 Auto Round；CanStartRound 已保證本局目前可以正式開始
     private startAutoRound(): void
     {
         if ( !this._isAutoRunning )
@@ -148,41 +162,30 @@ export class SlotGameManager extends Component
 
         this.StartRound();
 
-        // Infinite 保持 sentinel 不遞減；有限 Auto 在每局成功開始後才扣除一次
+        // Infinite Auto 不扣除 Count；有限 Auto 在每局開始後扣除一次剩餘局數
         if ( this._autoSpinCount !== GameConfig.GetInstance().AutoSpinInfiniteCount )
         {
             this._autoSpinCount--;
         }
     }
 
-    // Reward 開始時先更新 Win，讓 UI 與中獎表現在同一階段顯示本局得分
+    // Reward 開始時更新目前 Win，讓 UI 與中獎表現在同一階段顯示本局得分
     private onRewardStarted( spinResult: SpinResultData ): void
     {
-        if ( !this.PlayerInfo )
-        {
-            return;
-        }
-
         this.PlayerInfo.SetWin( spinResult.TotalScore );
     }
 
-    // Reward 完成且 SlotProcessor 已回 Idle 後先 Settlement，再決定 Auto 是否啟動下一局
-    private completeRound( spinResult: SpinResultData | null ): void
+    // Round 完成且 SlotProcessor 已回 Idle 後先結算本局 Result，再決定 Auto 是否開始下一局
+    private completeRound( spinResult: SpinResultData ): void
     {
-        if ( spinResult === null || !this.PlayerInfo )
-        {
-            this.StopAuto();
-            return;
-        }
-
-        this.PlayerInfo.AddWinToBalance();
+        this.PlayerInfo.AddWinToBalance( spinResult.TotalScore );
 
         if ( !this._isAutoRunning )
         {
             return;
         }
 
-        // 最後一局開始時 Count 已是 0；要等這一局完整完成到此 boundary 才真正結束 Auto
+        // 最後一局開始時 Count 已是 0；要等這一局完整完成後才真正結束 Auto
         if ( this._autoSpinCount === 0 )
         {
             this.StopAuto();

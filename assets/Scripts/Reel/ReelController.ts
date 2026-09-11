@@ -40,7 +40,7 @@ export class ReelController extends Component
     // 本次 Spin 已經運轉的時間
     private _spinElapsedTime: number = 0;
 
-    // 自動停輪時距離下一軸停輪已經過的時間
+    // 依序停輪時，距離上一軸收到 StopSpin 後已經過的時間
     private _stopIntervalElapsedTime: number = 0;
 
     // 下一個還沒收到 StopSpin 的 Reel Index
@@ -49,13 +49,13 @@ export class ReelController extends Component
     // 本次 Spin 各 Reel 最後要停下來的盤面結果
     private _reelResults: SymbolType[][] | null = null;
 
-    // 所有 Reel 停止並完成重設後通知 SlotProcessor
+    // 所有 Reel 回到 Idle 且 ReelController 完成收尾後通知 SlotProcessor
     private _onSpinFinished: ( () => void ) | null = null;
 
     // Spin 尚未結束且尚未進入 Skip Speed 時允許玩家要求 Skip
     public get CanSkipSpin(): boolean
     {
-        if ( this._speedLevel === ReelSpeedLevel.Skip )
+        if ( this._speedLevel === ReelSpeedLevel.Skip || this._reelResults === null )
         {
             return false;
         }
@@ -69,7 +69,7 @@ export class ReelController extends Component
             && this._nextStopReelIndex < this.Reels.length;
     }
 
-    // 只有目前沒有進行中的 Spin，且 Reel 數量正確時才能開始下一次 Spin
+    // 只有目前沒有進行中的 Spin 時才能開始下一次 Spin
     public get CanStartSpin(): boolean
     {
         return this._fsMachine.CurrentState === ReelControllerState.Idle;
@@ -135,7 +135,7 @@ export class ReelController extends Component
     // 玩家要求快速停輪；結果尚未準備完成時，本次操作不生效也不保存
     public SkipSpin(): void
     {
-        if ( !this.CanSkipSpin || this._reelResults === null )
+        if ( !this.CanSkipSpin )
         {
             return;
         }
@@ -251,7 +251,7 @@ export class ReelController extends Component
             }
             else
             {
-                this.updateAutoStopSequence( deltaTime, reelStopInterval );
+                this.updateStopSequence( deltaTime, reelStopInterval );
             }
         }
 
@@ -265,7 +265,7 @@ export class ReelController extends Component
     }
 
     // 依目前 ReelStopInterval 依序通知下一軸停輪
-    private updateAutoStopSequence( deltaTime: number, reelStopInterval: number ): void
+    private updateStopSequence( deltaTime: number, reelStopInterval: number ): void
     {
         this._stopIntervalElapsedTime += deltaTime;
 

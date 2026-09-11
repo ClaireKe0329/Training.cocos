@@ -68,8 +68,6 @@ export class SlotProcessor extends Component
     public get CanStartRound(): boolean
     {
         return this._fsMachine.CurrentState === SlotProcessorState.Idle
-            && this.ReelController !== null
-            && this.RewardShowProcessor !== null
             && this.ReelController.CanStartSpin
             && this.RewardShowProcessor.CanShowReward;
     }
@@ -93,6 +91,10 @@ export class SlotProcessor extends Component
     // Component 載入時建立 Round FSM
     protected onLoad(): void
     {
+        if ( !this.ReelController || !this.RewardShowProcessor )
+        {
+            throw new Error( '[SlotProcessor] ReelController 或 RewardShowProcessor 尚未設定。' );
+        }
         this.initFSM();
     }
 
@@ -175,13 +177,8 @@ export class SlotProcessor extends Component
         this.ReelController.SetSpeedLevel( this._reelSpeedLevel );
         this.ReelController.StartSpin( this.onReelSpinFinished.bind( this ) );
 
-        const spinResult: SpinResultData | null = this._spinResultProvider.GetSpinResult( this._roundBet );
+        const spinResult: SpinResultData = this._spinResultProvider.GetSpinResult( this._roundBet );
 
-        // 沒有可用 Result 時不設定停輪盤面，Reel 維持 Run 等待後續 Result Flow
-        if ( spinResult === null )
-        {
-            return;
-        }
 
         // SlotProcessor 保存完整 Result；ReelController 只取得最終停輪盤面
         this._spinResult = spinResult;
@@ -190,17 +187,11 @@ export class SlotProcessor extends Component
         console.log( '[SlotProcessor] 取得盤面結果', spinResult.SlotGrids.map( ( reelSymbols: SymbolType[] ) => reelSymbols.map( ( symbol: SymbolType ) => SymbolType[ symbol ] ) ) );
     }
 
-    // Reel Spin 全部完成後離開 Spinning，依本局 Result 決定是否進入 Reward
+    // Reel Spin 全部完成後離開 Spinning，進入 Reward
     private onReelSpinFinished(): void
     {
         if ( this._fsMachine.CurrentState !== SlotProcessorState.Spinning )
         {
-            return;
-        }
-
-        if ( this._spinResult === null )
-        {
-            this._fsMachine.ChangeState( SlotProcessorState.Complete );
             return;
         }
 
@@ -228,21 +219,18 @@ export class SlotProcessor extends Component
     // 進入 Complete 時完成本局資料處理，再回到 Idle Reset
     private enterComplete(): void
     {
-        const spinResult: SpinResultData | null = this._spinResult;
+        const spinResult: SpinResultData = this._spinResult;
         const onRoundFinished: ( ( spinResult: SpinResultData | null ) => void ) | null = this._onRoundFinished;
 
-        if ( spinResult !== null )
-        {
-            const lineScores = spinResult.LineResults.map( ( lineResult: ILineResultData ) => ( {
-                PaylineNumber: lineResult.PaylineIndex + 1,
-                Symbol: SymbolType[ lineResult.SymbolType ],
-                MatchCount: lineResult.MatchCount,
-                Score: lineResult.Score,
-            } ) );
+        const lineScores = spinResult.LineResults.map( ( lineResult: ILineResultData ) => ( {
+            PaylineNumber: lineResult.PaylineIndex + 1,
+            Symbol: SymbolType[ lineResult.SymbolType ],
+            MatchCount: lineResult.MatchCount,
+            Score: lineResult.Score,
+        } ) );
 
-            console.log( '[SlotProcessor] 各中獎 Payline 得分', lineScores );
-            console.log( '[SlotProcessor] 本局得分', spinResult.TotalScore );
-        }
+        console.log( '[SlotProcessor] 各中獎 Payline 得分', lineScores );
+        console.log( '[SlotProcessor] 本局得分', spinResult.TotalScore );
 
         // Round 已 Complete，接著回到 Idle Reset 上一局資料
         this._fsMachine.ChangeState( SlotProcessorState.Idle );

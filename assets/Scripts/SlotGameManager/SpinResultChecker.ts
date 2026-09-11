@@ -33,8 +33,8 @@ export class SpinResultChecker
 
         // GameConfig 已保證每種 Symbol 都有倍率設定，Checker 直接依此 Contract 使用
         const symbolMultiplier: ISymbolMultiplier = symbolMultipliers.find(
-            ( configuredMultiplier: ISymbolMultiplier ): boolean =>
-                configuredMultiplier.SymbolType === firstSymbol )!;
+            ( multiplier: ISymbolMultiplier ): boolean =>
+                multiplier.SymbolType === firstSymbol )!;
         let matchCount: number = 1;
         const winningPositions = [ { ReelIndex: 0, RowIndex: payline[ 0 ] } ];
 
@@ -57,7 +57,7 @@ export class SpinResultChecker
         // 以倍率設定中的最小連線數作為此 Symbol 的中獎門檻
         const minimumMatchCount: number = Math.min(
             ...Object.keys( symbolMultiplier.Multipliers ).map(
-                ( configuredMatchCount: string ): number => Number( configuredMatchCount ) ) );
+                ( matchCount: string ): number => Number( matchCount ) ) );
 
         if ( matchCount < minimumMatchCount )
         {

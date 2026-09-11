@@ -5,10 +5,10 @@ import { GameUtility } from '../GameUtility/GameUtility';
 import { ScoreCalculator } from './ScoreCalculator';
 import { SpinResultChecker } from './SpinResultChecker';
 
-// 定義單局 Spin Result 的取得方式；沒有合法結果時回傳 null
+// 定義單局 Spin Result 的取得方式
 export interface ISpinResultProvider
 {
-    GetSpinResult( bet: number ): SpinResultData | null;
+    GetSpinResult( bet: number ): SpinResultData;
 }
 
 // 本機產生盤面，交由 Checker 判斷連線、Calculator 計分後組成 SpinResultData

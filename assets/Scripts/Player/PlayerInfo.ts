@@ -3,17 +3,17 @@ import { GameConfig } from '../GameUtility/GameConfig';
 
 const { ccclass } = _decorator;
 
-// 保存玩家目前的 Balance、Bet 與 Win，不持有 UI 或決定 Round Flow
+// 保存玩家目前的 Balance、Bet 與 Win；只管理玩家資料，不決定 Game Flow
 @ccclass( 'PlayerInfo' )
 export class PlayerInfo extends Component
 {
     // 玩家目前可使用的 Balance
     private _balance: number = 0;
 
-    // 目前每局使用的 Bet
+    // 玩家目前設定的 Bet
     private _bet: number = 0;
 
-    // 目前一局顯示的 Win
+    // 玩家目前的 Win
     private _win: number = 0;
 
     public get Balance(): number
@@ -31,13 +31,13 @@ export class PlayerInfo extends Component
         return this._win;
     }
 
-    // 只判斷玩家資料是否足以支付 Bet；是否能開始 Round 由 SlotGameManager 決定
+    // 判斷目前 Balance 是否足以支付 Bet
     public get CanAffordBet(): boolean
     {
         return this._balance >= this._bet;
     }
 
-    // GameConfig 載入完成後初始化玩家資料
+    // 使用 GameConfig 的初始設定建立玩家資料
     protected start(): void
     {
         const gameConfig: GameConfig = GameConfig.GetInstance();
@@ -47,33 +47,33 @@ export class PlayerInfo extends Component
         this._win = 0;
     }
 
-    // 扣除目前一局使用的 Bet；呼叫時機由 SlotGameManager 負責
-    public DeductBet(): void
+    // 扣除 Bet 金額
+    public DeductBet( bet: number ): void
     {
-        this._balance -= this._bet;
+        this._balance -= bet;
     }
 
-    // 設定玩家下一局使用的 Bet；已開始的 Round 使用自己的 Bet snapshot，不受後續選擇影響
+    // 更新目前設定的 Bet
     public SetBet( bet: number ): void
     {
         this._bet = bet;
     }
 
-    // 清除上一局顯示的 Win
+    // 清除目前 Win
     public ResetWin(): void
     {
         this._win = 0;
     }
 
-    // 設定目前一局顯示的 Win
+    // 更新目前 Win
     public SetWin( win: number ): void
     {
         this._win = win;
     }
 
-    // 將目前 Win 結算至 Balance；結算時機由 SlotGameManager 負責
-    public AddWinToBalance(): void
+    // 將 Win 金額加入 Balance
+    public AddWinToBalance( win: number ): void
     {
-        this._balance += this._win;
+        this._balance += win;
     }
 }
